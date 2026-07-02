@@ -1,0 +1,12 @@
+{
+  "symbol": "^SPX",
+  "quote_date": "2023-08-25",
+  "snapshot": "1545",
+  "exercise_style": "european_index",
+  "number_of_raw_rows": 65344,
+  "number_of_filtered_option_rows": 29618,
+  "number_of_prepared_quotes": 5092,
+  "number_of_train_quotes": 4071,
+  "number_of_test_quotes": 1021,
+  "number_of_expirations": 37
+}

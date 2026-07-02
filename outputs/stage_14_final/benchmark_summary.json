@@ -1,0 +1,15 @@
+{
+  "mode": "full",
+  "number_of_quotes": 136,
+  "number_of_operator_unknowns": 66,
+  "selected_lambda": 1000.0,
+  "operator_stop_reason": "relative_objective_tolerance",
+  "operator_final_weighted_price_rmse": 0.9216706731282666,
+  "single_noise_local_volatility_winner": "operator_regularized",
+  "repeated_noise_mean_rmse_winner": "operator_regularized_linearized",
+  "shared_valid_fraction": 0.8823529411764706,
+  "ssvi_rho": -0.3493742147571887,
+  "ssvi_eta": 0.5373032415120966,
+  "ssvi_gamma": 0.38842310490812965,
+  "unit_square_cell_area": 0.020000000000000004
+}

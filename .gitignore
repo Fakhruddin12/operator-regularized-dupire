@@ -1,0 +1,17 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Jupyter-generated files
+.ipynb_checkpoints/
+
+# Local environments and editor files
+.venv/
+env/
+.DS_Store
+Thumbs.db
+
+# Generated nested archives
+outputs/stage_14_final.zip
+data/market.zip
