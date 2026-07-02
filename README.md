@@ -23,11 +23,11 @@ Dupire inversion requires derivatives of an option-price surface. Market quotes 
 
 This project instead parameterises the local variance as
 
-\[
+$$
 u(x,T)=\log \sigma_{\mathrm{loc}}^2(x,T),
 \qquad
 \sigma_{\mathrm{loc}}^2(x,T)=e^{u(x,T)},
-\]
+$$
 
 and calibrates it through the nonlinear PDE pricing map \(F(u)\):
 
