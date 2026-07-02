@@ -31,27 +31,27 @@ $$
 
 and calibrates it through the nonlinear PDE pricing map \(F(u)\):
 
-\[
+$$
 \min_u
 \left\|W\bigl(F(u)-C^{\mathrm{obs}}\bigr)\right\|_2^2
 +
 \lambda (u-u_{\mathrm{ref}})^\top R(u-u_{\mathrm{ref}}).
-\]
+$$
 
 Here:
 
-- \(W\) contains quote weights;
-- \(u_{\mathrm{ref}}\) is a fixed reference log-variance surface;
-- \(\lambda\) controls the fit-versus-stability trade-off;
-- \(R\) is the operator regulariser
+- $$(W$$) contains quote weights;
+- $$(u_{\mathrm{ref}})$$ is a fixed reference log-variance surface;
+- $$(\lambda)$$ controls the fit-versus-stability trade-off;
+- $$(R)$$ is the operator regulariser
 
-\[
+$$
 R=
 \beta I
 +\alpha_x D_x^\top D_x
 +\alpha_T D_T^\top D_T
 +\operatorname{diag}(V).
-\]
+$$
 
 The difference terms penalise roughness across log-moneyness and maturity. The potential \(V\) penalises unsupported corrections more strongly in sparse regions and in the wings. The first-difference construction leaves boundary values free and gives the natural discrete analogue of Neumann boundary conditions.
 
