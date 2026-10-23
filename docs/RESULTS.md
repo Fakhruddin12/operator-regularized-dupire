@@ -41,4 +41,4 @@ The pipeline implements a testable inverse-calibration hypothesis and exposes it
 - The Albani-style synthetic experiment uses the published truth and layout with new noise draws and known spot.
 - Quote weights use a declared vega-based scale, not measured bid–ask noise.
 
-[Full audit report](../reports/Dupire_Literature_Audit_Report.pdf) · [Numerical summary](../reports/literature_audit/numerical_summary.json) · [Exact assumptions and theory](../reports/Regularizer_Theory.md)
+[Full audit report](../Dupire_Literature_Audit_Report.pdf) · [Numerical summary](../reports/literature_audit/numerical_summary.json) · [Exact assumptions and theory](../reports/Regularizer_Theory.md)

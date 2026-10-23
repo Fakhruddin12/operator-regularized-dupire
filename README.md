@@ -19,7 +19,7 @@ I built a forward Dupire PDE pricer and a regularized calibration pipeline, then
 
 ![Known-truth recovery across ten noise draws](docs/assets/recovery-comparison.png)
 
-[**Results and interpretation**](docs/RESULTS.md) · [**Full audit report**](reports/Dupire_Literature_Audit_Report.pdf) · [**Theory**](reports/Regularizer_Theory.md) · [**Literature comparison**](reports/Literature_Comparison.md)
+[**Results and interpretation**](docs/RESULTS.md) · [**Full audit report**](Dupire_Literature_Audit_Report.pdf) · [**Theory**](reports/Regularizer_Theory.md) · [**Literature comparison**](reports/Literature_Comparison.md)
 
 ## The modelling idea
 
