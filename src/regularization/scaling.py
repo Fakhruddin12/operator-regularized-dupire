@@ -5,7 +5,7 @@ gives correct derivative units. To make penalty magnitudes more comparable
 across grids, this module additionally:
 
 1. maps log-moneyness and maturity to the unit square;
-2. multiplies the discrete squared-derivative sums by the unit-cell area.
+2. uses nodal trapezoidal and edge midpoint quadrature on the unit square.
 
 The resulting matrix approximates an integral over nondimensional coordinates.
 """
@@ -13,7 +13,7 @@ The resulting matrix approximates an integral over nondimensional coordinates.
 from __future__ import annotations
 
 import numpy as np
-from scipy.sparse import csc_matrix
+from scipy.sparse import csc_matrix, diags
 
 from src.regularization.operators import (
     build_regularization_matrix,
@@ -111,7 +111,7 @@ def build_nondimensional_regularization_matrix(
     )
     cell_area = delta_tau * delta_xi
 
-    unscaled_matrix, D_xi, D_tau = (
+    _, D_xi, D_tau = (
         build_regularization_matrix(
             number_of_maturities=maturity_grid.size,
             number_of_log_moneyness_points=x_grid.size,
@@ -124,7 +124,24 @@ def build_nondimensional_regularization_matrix(
         )
     )
 
-    square_root_area = np.sqrt(cell_area)
+    # Nodal magnitude/potential terms require trapezoidal endpoint weights.
+    # First derivatives live on edges: midpoint quadrature along the derivative
+    # direction and trapezoidal weights in the transverse direction. Multiplying
+    # every node/edge by cell_area overcounted boundary contributions on coarse
+    # grids and made the nominal integral change unnecessarily with resolution.
+    wx = np.full(x_grid.size, delta_xi)
+    wt = np.full(maturity_grid.size, delta_tau)
+    wx[[0, -1]] *= 0.5
+    wt[[0, -1]] *= 0.5
+    mass = np.kron(wt, wx)
+    x_edge_weights = np.repeat(wt, x_grid.size - 1) * delta_xi
+    t_edge_weights = np.tile(wx, maturity_grid.size - 1) * delta_tau
+    weighted_D_xi = diags(np.sqrt(x_edge_weights)) @ D_xi
+    weighted_D_tau = diags(np.sqrt(t_edge_weights)) @ D_tau
+    pot = np.zeros_like(mass) if potential is None else np.asarray(potential, float).reshape(-1)
+    scaled_matrix = (diags(mass * (beta + pot))
+                     + alpha_x * (weighted_D_xi.T @ weighted_D_xi)
+                     + alpha_T * (weighted_D_tau.T @ weighted_D_tau))
 
     metadata = {
         "log_moneyness_range": float(
@@ -139,9 +156,9 @@ def build_nondimensional_regularization_matrix(
     }
 
     return (
-        (cell_area * unscaled_matrix).tocsc(),
-        (square_root_area * D_xi).tocsc(),
-        (square_root_area * D_tau).tocsc(),
+        scaled_matrix.tocsc(),
+        weighted_D_xi.tocsc(),
+        weighted_D_tau.tocsc(),
         metadata,
     )
 

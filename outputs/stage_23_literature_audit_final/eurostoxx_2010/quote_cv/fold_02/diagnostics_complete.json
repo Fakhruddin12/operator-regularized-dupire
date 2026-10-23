@@ -1,0 +1,148 @@
+{
+  "unregularized_stop": "relative_objective_tolerance",
+  "unregularized_bound_fraction": 0.0761904761904762,
+  "unregularized_history": [
+    {
+      "iteration": 0,
+      "objective": 0.39958929348337596,
+      "gradient_inf": 0.32754989699672477
+    },
+    {
+      "iteration": 1,
+      "objective": 0.39561908080677655,
+      "gradient_inf": 0.3260866076163428
+    },
+    {
+      "iteration": 2,
+      "objective": 0.3917132570373881,
+      "gradient_inf": 0.3244328573399965
+    },
+    {
+      "iteration": 3,
+      "objective": 0.3878715410699027,
+      "gradient_inf": 0.32264433916360136
+    },
+    {
+      "iteration": 4,
+      "objective": 0.3843124600341811,
+      "gradient_inf": 0.31998291558969816
+    },
+    {
+      "iteration": 5,
+      "objective": 0.3810635416665978,
+      "gradient_inf": 0.3163754291903074
+    },
+    {
+      "iteration": 6,
+      "objective": 0.3777309122574042,
+      "gradient_inf": 0.31305005154552823
+    },
+    {
+      "iteration": 7,
+      "objective": 0.3743023779284624,
+      "gradient_inf": 0.3100274008175
+    },
+    {
+      "iteration": 8,
+      "objective": 0.3708392196201267,
+      "gradient_inf": 0.30708008313266155
+    },
+    {
+      "iteration": 9,
+      "objective": 0.36868011994249983,
+      "gradient_inf": 0.302439859099052
+    },
+    {
+      "iteration": 10,
+      "objective": 0.36768148848725735,
+      "gradient_inf": 0.29725226919322434
+    },
+    {
+      "iteration": 11,
+      "objective": 0.3676810788573318,
+      "gradient_inf": 0.29184117124332465
+    },
+    {
+      "iteration": 12,
+      "objective": 0.3256189448951528,
+      "gradient_inf": 0.27784867292636994
+    },
+    {
+      "iteration": 13,
+      "objective": 0.30682224753865667,
+      "gradient_inf": 0.3069431942481864
+    },
+    {
+      "iteration": 14,
+      "objective": 0.30354015739874907,
+      "gradient_inf": 0.35497646776193537
+    },
+    {
+      "iteration": 15,
+      "objective": 0.16704684872364775,
+      "gradient_inf": 0.07545024653965644
+    },
+    {
+      "iteration": 16,
+      "objective": 0.16002755417639988,
+      "gradient_inf": 0.0219334594968316
+    },
+    {
+      "iteration": 17,
+      "objective": 0.1593216220100234,
+      "gradient_inf": 0.012927038612695313
+    },
+    {
+      "iteration": 18,
+      "objective": 0.15906220102640412,
+      "gradient_inf": 0.006473749347815736
+    },
+    {
+      "iteration": 19,
+      "objective": 0.1590234984838101,
+      "gradient_inf": 0.002047102120044809
+    },
+    {
+      "iteration": 20,
+      "objective": 0.15893453116968567,
+      "gradient_inf": 0.0020558005765743204
+    },
+    {
+      "iteration": 21,
+      "objective": 0.15885210760726082,
+      "gradient_inf": 0.00225667413518414
+    },
+    {
+      "iteration": 22,
+      "objective": 0.15879144446542373,
+      "gradient_inf": 0.006789985077902046
+    },
+    {
+      "iteration": 23,
+      "objective": 0.15872983081901912,
+      "gradient_inf": 0.006982866070905893
+    },
+    {
+      "iteration": 24,
+      "objective": 0.15871581509262056,
+      "gradient_inf": 0.004066723973952784
+    },
+    {
+      "iteration": 25,
+      "objective": 0.1587143451295309,
+      "gradient_inf": 0.004341790197758283
+    },
+    {
+      "iteration": 26,
+      "objective": 0.15870896578883553,
+      "gradient_inf": 0.006946032377248379
+    }
+  ],
+  "fine_config": {
+    "x_limit": 3.0,
+    "nx": 801,
+    "nt": 480,
+    "clustering": 0.15,
+    "startup_steps": 2
+  }
+}

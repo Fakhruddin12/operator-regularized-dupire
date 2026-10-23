@@ -1,0 +1,9 @@
+{
+  "model": "SSVI implied total variance differentiated by Dupire, evaluated as a continuous local-volatility callback",
+  "quote_rows": 1043,
+  "pde_domain": [
+    -1.0,
+    1.0
+  ],
+  "interpretation": "Numerical consistency diagnostic only. It compares a PDE approximation of the fitted SSVI model with its direct normalized Black pricing formula; it is not an empirical model-selection or trading result."
+}

@@ -1,0 +1,26 @@
+{
+  "test": "leave-one-expiry-out grouped cross-validation",
+  "valuation_dates": 1,
+  "expiry_folds": 8,
+  "quotes": 1043,
+  "frozen_lambda": 1000.0,
+  "operator_wins_by_expiry": 3,
+  "expiry_win_fraction": 0.375,
+  "pooled_metrics": [
+    {
+      "method": "ssvi",
+      "number_of_quotes": 1043,
+      "price_rmse": 1.4066429387302315,
+      "weighted_price_rmse": 6.100434853773323,
+      "inside_bid_ask_fraction": 0.16970278044103548
+    },
+    {
+      "method": "ssvi_operator_correction_linearized",
+      "number_of_quotes": 1043,
+      "price_rmse": 3.2683407048254973,
+      "weighted_price_rmse": 9.402870306248944,
+      "inside_bid_ask_fraction": 0.06999041227229147
+    }
+  ],
+  "interpretation": "Whole expiries are held out; all quotes at the target expiry are excluded from both SSVI and correction fitting. The correction is the regularized linearized Stage 18 update, repriced by the nonlinear PDE. One valuation date means this tests maturity transfer on one surface, not temporal or regime robustness."
+}

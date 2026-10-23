@@ -1,0 +1,51 @@
+{
+  "test": "leave-one-expiry-out grouped cross-validation",
+  "valuation_dates": 1,
+  "expiry_folds": 8,
+  "quotes": 1043,
+  "frozen_lambda": 1000.0,
+  "operator_wins_by_expiry": 3,
+  "expiry_win_fraction": 0.375,
+  "pooled_metrics": [
+    {
+      "method": "ssvi_pde",
+      "split": "test",
+      "number_of_quotes": 1043,
+      "price_rmse": 1.4022641698093046,
+      "price_mae": 1.062277249196893,
+      "weighted_price_rmse": 6.089099833805316,
+      "mean_gaussian_nll": 18.195877853184868,
+      "inside_bid_ask_fraction": 0.17353787152444872,
+      "implied_volatility_rmse": 0.004340770859536781,
+      "implied_volatility_mae": 0.002486224241210109
+    },
+    {
+      "method": "ssvi",
+      "split": "test",
+      "number_of_quotes": 1043,
+      "price_rmse": 1.4066429387302304,
+      "price_mae": 1.0692921462523421,
+      "weighted_price_rmse": 6.100434853773328,
+      "mean_gaussian_nll": 18.26496216272711,
+      "inside_bid_ask_fraction": 0.16970278044103548,
+      "implied_volatility_rmse": 0.004375394150708015,
+      "implied_volatility_mae": 0.002514741907305182
+    },
+    {
+      "method": "ssvi_operator_correction_nonlinear",
+      "split": "test",
+      "number_of_quotes": 1043,
+      "price_rmse": 2.849655418913081,
+      "price_mae": 2.0991765103563695,
+      "weighted_price_rmse": 8.137466234583123,
+      "mean_gaussian_nll": 32.76648781965111,
+      "inside_bid_ask_fraction": 0.09108341323106424,
+      "implied_volatility_rmse": 0.0037560653534512074,
+      "implied_volatility_mae": 0.002993949137691051
+    }
+  ],
+  "nonlinear_iterations_requested": 4,
+  "interpretation": "Leave-one-expiry-out on one valuation date. Each expiry is excluded in full from fitting both SSVI and the correction. The correction is nonlinearly refined; all predictions use the full PDE. Lambda=1000 was frozen from earlier validation on this same panel, so this is not a fully untouched nested test. Results test maturity transfer on one cross-section, not chronological/regime robustness.",
+  "operator_wins_vs_pde_ssvi_by_expiry": 3,
+  "expiry_win_fraction_vs_pde_ssvi": 0.375
+}

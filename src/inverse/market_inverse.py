@@ -136,6 +136,29 @@ def price_market_quotes_from_log_variance(
         log_moneyness=calibration_log_moneyness,
     )
 
+    return price_market_quotes_from_local_volatility_function(
+        local_volatility=local_volatility,
+        quote_data=quote_data,
+        pde_x_min=pde_x_min,
+        pde_x_max=pde_x_max,
+        number_of_pde_x_points=number_of_pde_x_points,
+        number_of_time_steps=number_of_time_steps,
+        theta=theta,
+    )
+
+
+def price_market_quotes_from_local_volatility_function(
+    local_volatility: Callable[[np.ndarray, float], np.ndarray],
+    quote_data: pd.DataFrame,
+    pde_x_min: float = -1.0,
+    pde_x_max: float = 1.0,
+    number_of_pde_x_points: int = 201,
+    number_of_time_steps: int = 150,
+    theta: float = 0.5,
+) -> np.ndarray:
+    """Price market quotes from any positive ``sigma_loc(x,T)`` callback."""
+    _validate_market_quote_data(quote_data)
+
     maximum_maturity = float(
         quote_data["maturity"].max()
     )

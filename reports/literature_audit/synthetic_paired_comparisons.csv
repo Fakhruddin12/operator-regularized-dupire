@@ -1,0 +1,7 @@
+region,comparison,wins,draws,mean_rmse_change_percent
+central,operator_full vs ssvi_pde,5,10,83.26196054854206
+central,operator_full vs h1,2,10,1.699185748180887
+central,operator_full vs h2,8,10,3.9419883170557224
+full,operator_full vs ssvi_pde,5,10,136.28692204371902
+full,operator_full vs h1,5,10,1.4017353885079409
+full,operator_full vs h2,8,10,-16.867536734724055

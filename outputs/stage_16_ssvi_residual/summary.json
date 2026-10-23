@@ -1,0 +1,20 @@
+{
+  "experiment": "SSVI-centred operator residual correction",
+  "outer_train_quotes": 840,
+  "outer_test_quotes": 203,
+  "inner_fit_quotes": 673,
+  "inner_validation_quotes": 167,
+  "selected_lambda": 10000.0,
+  "maximum_iterations_requested": 10,
+  "stop_reason": "relative_objective_tolerance",
+  "operator_local_volatility_range": [
+    0.09135144471317291,
+    0.6728870777156234
+  ],
+  "test_weighted_price_rmse": {
+    "operator_ssvi_residual": 1.8100216534785203,
+    "ssvi": 5.236564464466041,
+    "ssvi_prior_pde": 8.483700422078462
+  },
+  "interpretation": "One-date nested cross-sectional model comparison only. The outer test was not used for tuning. The candidate is an SSVI prior plus a regularized correction; any gain over SSVI must be confirmed on chronological market dates and against costs before use beyond calibration."
+}

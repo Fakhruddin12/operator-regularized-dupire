@@ -1,0 +1,61 @@
+{
+  "source_archive_sha256": "39d69c502f1ddc3ac7a57279e634e4bc1091da9ac1a09f7cd4b3a5844342f174",
+  "changed_existing_files": [
+    "README.md",
+    "reports/README.txt",
+    "requirements.txt",
+    "src/evaluation/market_ssvi.py",
+    "src/evaluation/ssvi_dupire.py",
+    "src/regularization/operators.py",
+    "src/regularization/scaling.py"
+  ],
+  "findings": [
+    {
+      "id": "A1",
+      "severity": "material extrapolation defect",
+      "description": "PCHIP preserves monotonicity only between knots. Cubic extrapolation could produce negative ATM variance slopes outside fitted expiries.",
+      "fix": "Shared positive linear ATM tails for direct prices and Dupire derivatives."
+    },
+    {
+      "id": "A2",
+      "severity": "grid scaling defect",
+      "description": "Uniform cell-area weights applied to all boundary nodes inflated magnitude/potential integrals on coarse grids.",
+      "fix": "Trapezoidal nodal and midpoint/transverse-trapezoidal edge quadrature."
+    },
+    {
+      "id": "A3",
+      "severity": "validation/numerics limitation",
+      "description": "Original fixed domain [-1,1], uniform times and quote-dependent max maturity were unsuitable for the wider/longer literature inputs.",
+      "fix": "Dedicated fixed-grid solver with clustered states, exact quote-time knots, startup damping and refined-grid/domain repricing."
+    },
+    {
+      "id": "A4",
+      "severity": "reference admissibility limitation",
+      "description": "Original market SSVI fit used soft finite-grid constraints and allowed gamma above 0.5, without a global butterfly guarantee.",
+      "fix": "The new controlled benchmark uses the same conservatively constrained SSVI price fit for all penalty methods. Historical fitter retained as a legacy implementation."
+    },
+    {
+      "id": "A5",
+      "severity": "benchmark interpretation limitation",
+      "description": "The historical expiry diagnostic reused a lambda previously chosen on the same market panel.",
+      "fix": "Each new outer fold refits SSVI and independently tunes its penalty on an inner split."
+    },
+    {
+      "id": "A6",
+      "severity": "mathematical notation clarification",
+      "description": "With a taper q, the latent correction amplitude h is not the actual log-variance deviation: u-u_ref=q*h. The implemented penalty is h^T R h, not (q*h)^T R (q*h).",
+      "fix": "Retained the final Stage 18 specification and state the latent-amplitude objective explicitly; Neumann regularizer behavior is distinct from taper and price-PDE boundaries."
+    }
+  ],
+  "preserved_intended_features": [
+    "log local variance correction",
+    "full-domain SSVI reference",
+    "compact taper",
+    "positive volatility",
+    "anisotropic H1 operator",
+    "nonnegative quote-density and wing potentials",
+    "penalty on the total latent correction",
+    "nonlinear PDE objective",
+    "no Gaussian-process or trading extension"
+  ]
+}

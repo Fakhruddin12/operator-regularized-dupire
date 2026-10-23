@@ -1,0 +1,19 @@
+{
+  "retrieved_on": "2026-10-22",
+  "sources": [
+    {
+      "url": "https://github.com/lballabio/QuantLib/blob/master/test-suite/andreasenhugevolatilityinterpl.cpp",
+      "downloaded_file_sha256": "1b5776ed03a13c32cdaa9d4290a6e53d18425b8f98f6ce5e60c5760f8338a39a"
+    },
+    {
+      "url": "https://papers.neurips.cc/paper_files/paper/2020/file/858e47701162578e5e627cd93ab0938a-Supplemental.zip",
+      "archive_sha256": "1ab26e21ceff0c3a6dcfcbcba364a0e641adcc59463b91407e66d8e691e6b9a0",
+      "nested_path": "code_neurips2020.zip/data/train_data.csv",
+      "observation_count": 324
+    }
+  ],
+  "files": {
+    "ackerer_original_bates_train_data.csv": "a5c7c060cb9e0cd92d237ac60514ce7eaebd72c8fa09129307c3ed76738605b8",
+    "eurostoxx_2010_155_quotes.json": "63dafae613a4a99746f8176dcd96a19b9434ee75888818a858f1f7081eb4921c"
+  }
+}

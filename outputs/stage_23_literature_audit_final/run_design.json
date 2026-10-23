@@ -1,0 +1,34 @@
+{
+  "config": {
+    "x_limit": 3.0,
+    "nx": 401,
+    "nt": 240,
+    "clustering": 0.15,
+    "startup_steps": 2
+  },
+  "methods": [
+    "h1",
+    "h2",
+    "h1_density",
+    "h1_wing",
+    "operator_full"
+  ],
+  "lambdas": [
+    0.0001,
+    0.001,
+    0.01,
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "tasks": 50,
+  "parameter_shape": [
+    7,
+    15
+  ],
+  "inner_split": "4-way interleaved, fold 1 validation",
+  "objective": "mean scaled price squared error + lambda h^T R h / p; trace-normalized R",
+  "correction_bound": 2.5,
+  "scope": "controlled penalty ablation, not exact original-paper implementation"
+}

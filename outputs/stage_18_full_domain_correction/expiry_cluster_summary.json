@@ -1,0 +1,19 @@
+{
+  "paired_test_quotes": 203,
+  "expiry_clusters": 8,
+  "operator_wins_by_expiry": 8,
+  "expiry_win_fraction": 1.0,
+  "pooled_ssvi_weighted_mse": 27.421607929173177,
+  "pooled_operator_weighted_mse": 0.335026564355045,
+  "pooled_ssvi_weighted_rmse": 5.236564515899062,
+  "pooled_operator_weighted_rmse": 0.578814792792172,
+  "relative_weighted_rmse_reduction": 0.8894666930895636,
+  "mean_paired_weighted_squared_error_reduction": 27.086581364818127,
+  "expiry_cluster_bootstrap_95_interval": [
+    13.147644932544855,
+    43.551798457724146
+  ],
+  "bootstrap_repetitions": 20000,
+  "bootstrap_seed": 20261017,
+  "interpretation": "Descriptive uncertainty over eight expiry clusters on one cross-sectional date. The clusters are not independent market dates; the interval is not evidence of temporal robustness or alpha."
+}

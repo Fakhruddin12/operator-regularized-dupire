@@ -21,6 +21,7 @@ import pandas as pd
 from scipy.interpolate import PchipInterpolator
 from scipy.optimize import least_squares
 from scipy.special import expit
+from src.evaluation.ssvi_term_structure import theta_and_derivative
 
 from src.pricing.black_scholes import (
     black_scholes_vega,
@@ -579,13 +580,7 @@ def evaluate_ssvi_dupire(
     if np.any(query_T <= 0):
         raise ValueError("maturities must be positive.")
 
-    theta_spline = PchipInterpolator(
-        np.concatenate(([0.0], fit.maturities)),
-        np.concatenate(([0.0], fit.theta)),
-        extrapolate=True,
-    )
-    theta = theta_spline(query_T)
-    theta_t = theta_spline.derivative()(query_T)
+    theta, theta_t = theta_and_derivative(fit.maturities, fit.theta, query_T)
 
     phi = _phi(theta, fit.eta, fit.gamma)
     z = phi * query_k + fit.rho

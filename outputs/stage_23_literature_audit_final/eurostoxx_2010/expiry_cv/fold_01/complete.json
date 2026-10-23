@@ -1,0 +1,513 @@
+{
+  "dataset": "eurostoxx_2010",
+  "protocol": "expiry_cv",
+  "fold": 1,
+  "config": {
+    "x_limit": 3.0,
+    "nx": 401,
+    "nt": 240,
+    "clustering": 0.15,
+    "startup_steps": 2
+  },
+  "train_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    43,
+    44,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    53,
+    54,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    68,
+    69,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    78,
+    79,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    93,
+    94,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    103,
+    104,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153,
+    154
+  ],
+  "test_indices": [
+    30,
+    42,
+    45,
+    52,
+    55,
+    67,
+    70,
+    77,
+    80,
+    92,
+    95,
+    102,
+    105,
+    117
+  ],
+  "ssvi_fit": {
+    "maturities": [
+      0.025,
+      0.197,
+      0.274,
+      0.523,
+      0.772,
+      1.769,
+      2.267,
+      2.784,
+      3.781,
+      4.778,
+      5.774
+    ],
+    "theta": [
+      0.0013222409031754413,
+      0.009856536423409664,
+      0.014186483539352427,
+      0.026798116074662086,
+      0.039881977533094096,
+      0.0955043134267709,
+      0.12222032609150223,
+      0.15317896165273248,
+      0.21541488388457963,
+      0.2791718032166328,
+      0.36477645352957505
+    ],
+    "rho": -0.6050746782712054,
+    "eta": 1.4884227071242226,
+    "gamma": 0.29020856719226595,
+    "objective": 29.970668216364587,
+    "success": true,
+    "message": "`ftol` termination condition is satisfied.",
+    "number_of_usable_quotes": 141,
+    "fit_seconds": 0.03598259099999268
+  },
+  "selections": {
+    "h1": 1e-06,
+    "h2": 1.0,
+    "h1_density": 10.0,
+    "h1_wing": 10.0,
+    "operator_full": 10.0
+  },
+  "solver": {
+    "ssvi_pde": {
+      "stop": "baseline",
+      "seconds": 0.0
+    },
+    "ssvi_direct": {
+      "stop": "baseline",
+      "seconds": 0.0
+    },
+    "h1": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 12.195256439999866,
+      "bound_fraction": 0.11428571428571428
+    },
+    "h2": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 1.742114139000023,
+      "bound_fraction": 0.0
+    },
+    "h1_density": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 0.8088221390003127,
+      "bound_fraction": 0.0
+    },
+    "h1_wing": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 0.8628281439996499,
+      "bound_fraction": 0.0
+    },
+    "operator_full": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 0.8384864380000181,
+      "bound_fraction": 0.0
+    }
+  },
+  "histories": {
+    "ssvi_pde": [],
+    "ssvi_direct": [],
+    "h1": [
+      {
+        "iteration": 0,
+        "objective": 0.4184361353199157,
+        "gradient_inf": 0.34646804995000463
+      },
+      {
+        "iteration": 1,
+        "objective": 0.4112006721328888,
+        "gradient_inf": 0.3437257544355293
+      },
+      {
+        "iteration": 2,
+        "objective": 0.403972030557441,
+        "gradient_inf": 0.34060761750649976
+      },
+      {
+        "iteration": 3,
+        "objective": 0.39654838591458,
+        "gradient_inf": 0.33707180942300335
+      },
+      {
+        "iteration": 4,
+        "objective": 0.38906137203831587,
+        "gradient_inf": 0.33231586003889424
+      },
+      {
+        "iteration": 5,
+        "objective": 0.3821881569241131,
+        "gradient_inf": 0.3264147887203072
+      },
+      {
+        "iteration": 6,
+        "objective": 0.3764779154802977,
+        "gradient_inf": 0.3202739408163918
+      },
+      {
+        "iteration": 7,
+        "objective": 0.3712905844966533,
+        "gradient_inf": 0.31476154924505695
+      },
+      {
+        "iteration": 8,
+        "objective": 0.3666202685322564,
+        "gradient_inf": 0.30959287569766447
+      },
+      {
+        "iteration": 9,
+        "objective": 0.36272506725406567,
+        "gradient_inf": 0.3055519405365338
+      },
+      {
+        "iteration": 10,
+        "objective": 0.3598675245953592,
+        "gradient_inf": 0.30116562879889736
+      },
+      {
+        "iteration": 11,
+        "objective": 0.35963204541774674,
+        "gradient_inf": 0.29934444273574495
+      },
+      {
+        "iteration": 12,
+        "objective": 0.3292765742548678,
+        "gradient_inf": 0.25976507753449035
+      },
+      {
+        "iteration": 13,
+        "objective": 0.30758635501757664,
+        "gradient_inf": 0.22127520203208303
+      },
+      {
+        "iteration": 14,
+        "objective": 0.2983695559503544,
+        "gradient_inf": 0.24863207104478216
+      },
+      {
+        "iteration": 15,
+        "objective": 0.28619416225481653,
+        "gradient_inf": 0.22611111759764263
+      },
+      {
+        "iteration": 16,
+        "objective": 0.2769848173467956,
+        "gradient_inf": 0.21047676237151203
+      },
+      {
+        "iteration": 17,
+        "objective": 0.2716260731005166,
+        "gradient_inf": 0.20833304716092105
+      },
+      {
+        "iteration": 18,
+        "objective": 0.2709859504034262,
+        "gradient_inf": 0.21606137446132562
+      },
+      {
+        "iteration": 19,
+        "objective": 0.1913780998378096,
+        "gradient_inf": 0.07182045644609367
+      },
+      {
+        "iteration": 20,
+        "objective": 0.1834002535744105,
+        "gradient_inf": 0.026963075939745985
+      },
+      {
+        "iteration": 21,
+        "objective": 0.18224952642059408,
+        "gradient_inf": 0.011208791671333736
+      },
+      {
+        "iteration": 22,
+        "objective": 0.18189444999173285,
+        "gradient_inf": 0.005952826072044456
+      },
+      {
+        "iteration": 23,
+        "objective": 0.18173951626132762,
+        "gradient_inf": 0.008587312096836535
+      },
+      {
+        "iteration": 24,
+        "objective": 0.18165898795069493,
+        "gradient_inf": 0.012539710719177673
+      },
+      {
+        "iteration": 25,
+        "objective": 0.18163646159486108,
+        "gradient_inf": 0.019496953052177586
+      },
+      {
+        "iteration": 26,
+        "objective": 0.18160714278845563,
+        "gradient_inf": 0.02007638104515586
+      },
+      {
+        "iteration": 27,
+        "objective": 0.18158219332410144,
+        "gradient_inf": 0.020435351472112
+      },
+      {
+        "iteration": 28,
+        "objective": 0.18155773791052437,
+        "gradient_inf": 0.0211098543072671
+      },
+      {
+        "iteration": 29,
+        "objective": 0.18155054394165157,
+        "gradient_inf": 0.023260691191292156
+      },
+      {
+        "iteration": 30,
+        "objective": 0.18154985169289228,
+        "gradient_inf": 0.02250213652191661
+      },
+      {
+        "iteration": 31,
+        "objective": 0.18154783158732832,
+        "gradient_inf": 0.0237262571875082
+      },
+      {
+        "iteration": 32,
+        "objective": 0.18154598610015135,
+        "gradient_inf": 0.02296876710718084
+      },
+      {
+        "iteration": 33,
+        "objective": 0.18154475475459822,
+        "gradient_inf": 0.023533268368084934
+      }
+    ],
+    "h2": [
+      {
+        "iteration": 0,
+        "objective": 0.4184361353199157,
+        "gradient_inf": 0.34646804995000463
+      },
+      {
+        "iteration": 1,
+        "objective": 0.3151387353670524,
+        "gradient_inf": 0.2582986548868884
+      },
+      {
+        "iteration": 2,
+        "objective": 0.2432360485523344,
+        "gradient_inf": 0.16509735557365213
+      },
+      {
+        "iteration": 3,
+        "objective": 0.20323625810647075,
+        "gradient_inf": 0.0651907055876746
+      },
+      {
+        "iteration": 4,
+        "objective": 0.19578334561625046,
+        "gradient_inf": 0.0008487249407984959
+      },
+      {
+        "iteration": 5,
+        "objective": 0.19577610038428037,
+        "gradient_inf": 4.6398939385941876e-05
+      },
+      {
+        "iteration": 6,
+        "objective": 0.19577597948171413,
+        "gradient_inf": 5.21755452641097e-06
+      }
+    ],
+    "h1_density": [
+      {
+        "iteration": 0,
+        "objective": 0.4184361353199157,
+        "gradient_inf": 0.34646804995000463
+      },
+      {
+        "iteration": 1,
+        "objective": 0.23798910010031937,
+        "gradient_inf": 0.0053914348606223786
+      },
+      {
+        "iteration": 2,
+        "objective": 0.23789231461586327,
+        "gradient_inf": 6.256342986581294e-05
+      }
+    ],
+    "h1_wing": [
+      {
+        "iteration": 0,
+        "objective": 0.4184361353199157,
+        "gradient_inf": 0.34646804995000463
+      },
+      {
+        "iteration": 1,
+        "objective": 0.2363007145608379,
+        "gradient_inf": 0.0060893215826852125
+      },
+      {
+        "iteration": 2,
+        "objective": 0.23618947640326393,
+        "gradient_inf": 6.31655953761863e-05
+      }
+    ],
+    "operator_full": [
+      {
+        "iteration": 0,
+        "objective": 0.4184361353199157,
+        "gradient_inf": 0.34646804995000463
+      },
+      {
+        "iteration": 1,
+        "objective": 0.23934438983299772,
+        "gradient_inf": 0.005160156292098658
+      },
+      {
+        "iteration": 2,
+        "objective": 0.23924808417501836,
+        "gradient_inf": 6.207000329189367e-05
+      }
+    ]
+  }
+}

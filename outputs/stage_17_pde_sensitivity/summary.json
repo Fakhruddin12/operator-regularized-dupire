@@ -1,0 +1,24 @@
+{
+  "purpose": "PDE discretisation sensitivity; no refit at finer grids",
+  "grids": [
+    {
+      "x_points": 151,
+      "time_steps": 100
+    },
+    {
+      "x_points": 201,
+      "time_steps": 200
+    },
+    {
+      "x_points": 301,
+      "time_steps": 400
+    },
+    {
+      "x_points": 401,
+      "time_steps": 800
+    }
+  ],
+  "quote_rows": 1043,
+  "test_rows": 203,
+  "interpretation": "A material drop in the SSVI-local-vol PDE pricing error as the grid is refined indicates discretisation bias. A frozen residual model's performance must be judged on the finest stable grid, and ultimately by a refit using that grid."
+}

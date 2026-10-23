@@ -1,0 +1,17 @@
+{
+  "shape": [
+    9,
+    19
+  ],
+  "selection": "Fold 0 fixed in advance for each dataset; same inner validation; no outcome-dependent choice.",
+  "datasets": [
+    "eurostoxx_2010",
+    "bates_author",
+    "albani_noise_00"
+  ],
+  "methods": [
+    "h1",
+    "h2",
+    "operator_full"
+  ]
+}

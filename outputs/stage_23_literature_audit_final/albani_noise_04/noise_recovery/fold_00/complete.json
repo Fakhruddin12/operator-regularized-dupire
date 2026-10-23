@@ -1,0 +1,360 @@
+{
+  "dataset": "albani_noise_04",
+  "protocol": "noise_recovery",
+  "fold": 0,
+  "config": {
+    "x_limit": 3.0,
+    "nx": 401,
+    "nt": 240,
+    "clustering": 0.15,
+    "startup_steps": 2
+  },
+  "parameter_shape": [
+    7,
+    15
+  ],
+  "train_indices": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    11,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    19,
+    21,
+    22,
+    23,
+    24,
+    26,
+    27,
+    28,
+    29,
+    32,
+    33,
+    34,
+    35,
+    37,
+    38,
+    39,
+    40,
+    42,
+    43,
+    44,
+    45,
+    47,
+    48,
+    49,
+    50,
+    52,
+    53,
+    54,
+    55,
+    57,
+    58,
+    59,
+    60,
+    63,
+    64,
+    65,
+    66,
+    68,
+    69,
+    70,
+    71,
+    73,
+    74,
+    75,
+    76,
+    78,
+    79,
+    80,
+    81,
+    83,
+    84,
+    85,
+    86,
+    88,
+    89,
+    90,
+    91,
+    94,
+    95,
+    96,
+    97,
+    99,
+    100,
+    101,
+    102,
+    104,
+    105,
+    106,
+    107,
+    109,
+    110,
+    111,
+    112,
+    114,
+    115,
+    116,
+    117,
+    119,
+    120,
+    121,
+    122,
+    125,
+    126,
+    127,
+    128,
+    130,
+    131,
+    132,
+    133,
+    135,
+    136,
+    137,
+    138,
+    140,
+    141,
+    142,
+    143,
+    145,
+    146,
+    147,
+    148,
+    150,
+    151,
+    152,
+    153
+  ],
+  "test_indices": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    31,
+    36,
+    41,
+    46,
+    51,
+    56,
+    61,
+    62,
+    67,
+    72,
+    77,
+    82,
+    87,
+    92,
+    93,
+    98,
+    103,
+    108,
+    113,
+    118,
+    123,
+    124,
+    129,
+    134,
+    139,
+    144,
+    149,
+    154
+  ],
+  "ssvi_fit": {
+    "maturities": [
+      0.1,
+      0.2,
+      0.30000000000000004,
+      0.4,
+      0.5
+    ],
+    "theta": [
+      0.005980157740242784,
+      0.012191111218140665,
+      0.01918844391530874,
+      0.026741384888261055,
+      0.03447020227389345
+    ],
+    "rho": -0.08353445113215864,
+    "eta": 1.918794463091966,
+    "gamma": 0.11849233780826293,
+    "objective": 253.80606071419146,
+    "success": true,
+    "message": "Both `ftol` and `xtol` termination conditions are satisfied.",
+    "number_of_usable_quotes": 120,
+    "fit_seconds": 0.13677101199994013
+  },
+  "selections": {
+    "h1": 10.0,
+    "h2": 100.0,
+    "h1_density": 10.0,
+    "h1_wing": 10.0,
+    "operator_full": 10.0
+  },
+  "solver": {
+    "ssvi_pde": {
+      "stop": "baseline",
+      "seconds": 0.0
+    },
+    "ssvi_direct": {
+      "stop": "baseline",
+      "seconds": 0.0
+    },
+    "h1": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 1.07917304099999,
+      "bound_fraction": 0.0
+    },
+    "h2": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 1.3253874509999832,
+      "bound_fraction": 0.0
+    },
+    "h1_density": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 1.1051548660000208,
+      "bound_fraction": 0.0
+    },
+    "h1_wing": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 1.0869522169999755,
+      "bound_fraction": 0.0
+    },
+    "operator_full": {
+      "stop": "relative_objective_tolerance",
+      "seconds": 1.1040655279999783,
+      "bound_fraction": 0.0
+    }
+  },
+  "histories": {
+    "ssvi_pde": [],
+    "ssvi_direct": [],
+    "h1": [
+      {
+        "iteration": 0,
+        "objective": 4.284634936312955,
+        "gradient_inf": 3.880162490095836
+      },
+      {
+        "iteration": 1,
+        "objective": 0.751950074057655,
+        "gradient_inf": 0.7905552789018868
+      },
+      {
+        "iteration": 2,
+        "objective": 0.7471637660605077,
+        "gradient_inf": 0.010571465659409524
+      },
+      {
+        "iteration": 3,
+        "objective": 0.7471621926921562,
+        "gradient_inf": 0.0003259836246484078
+      }
+    ],
+    "h2": [
+      {
+        "iteration": 0,
+        "objective": 4.284634936312955,
+        "gradient_inf": 3.880162490095836
+      },
+      {
+        "iteration": 1,
+        "objective": 1.8362129437065697,
+        "gradient_inf": 1.9646604410296624
+      },
+      {
+        "iteration": 2,
+        "objective": 0.9573491283115049,
+        "gradient_inf": 0.43866938057134114
+      },
+      {
+        "iteration": 3,
+        "objective": 0.9500918850242708,
+        "gradient_inf": 0.0205652714829904
+      },
+      {
+        "iteration": 4,
+        "objective": 0.9500903573871502,
+        "gradient_inf": 0.00039522075594854156
+      }
+    ],
+    "h1_density": [
+      {
+        "iteration": 0,
+        "objective": 4.284634936312955,
+        "gradient_inf": 3.880162490095836
+      },
+      {
+        "iteration": 1,
+        "objective": 0.7607581425583207,
+        "gradient_inf": 0.734766475693243
+      },
+      {
+        "iteration": 2,
+        "objective": 0.7560621480272605,
+        "gradient_inf": 0.009102647657655458
+      },
+      {
+        "iteration": 3,
+        "objective": 0.7560604480579207,
+        "gradient_inf": 0.0002334951604575329
+      }
+    ],
+    "h1_wing": [
+      {
+        "iteration": 0,
+        "objective": 4.284634936312955,
+        "gradient_inf": 3.880162490095836
+      },
+      {
+        "iteration": 1,
+        "objective": 0.7625443344258986,
+        "gradient_inf": 0.7038675764837963
+      },
+      {
+        "iteration": 2,
+        "objective": 0.7576818263498363,
+        "gradient_inf": 0.009872701787328705
+      },
+      {
+        "iteration": 3,
+        "objective": 0.7576800568606448,
+        "gradient_inf": 0.0003398397903553313
+      }
+    ],
+    "operator_full": [
+      {
+        "iteration": 0,
+        "objective": 4.284634936312955,
+        "gradient_inf": 3.880162490095836
+      },
+      {
+        "iteration": 1,
+        "objective": 0.7655451377127913,
+        "gradient_inf": 0.6892536408597253
+      },
+      {
+        "iteration": 2,
+        "objective": 0.7606894836416842,
+        "gradient_inf": 0.009095149254887715
+      },
+      {
+        "iteration": 3,
+        "objective": 0.7606876973922883,
+        "gradient_inf": 0.0002464551106911919
+      }
+    ]
+  }
+}

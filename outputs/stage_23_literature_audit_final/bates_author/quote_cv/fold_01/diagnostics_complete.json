@@ -1,0 +1,84 @@
+{
+  "unregularized_stop": "relative_objective_tolerance",
+  "unregularized_bound_fraction": 0.01904761904761905,
+  "unregularized_history": [
+    {
+      "iteration": 0,
+      "objective": 3.4029923585160478,
+      "gradient_inf": 0.8934451277468787
+    },
+    {
+      "iteration": 1,
+      "objective": 3.378533146927263,
+      "gradient_inf": 0.8839327941447754
+    },
+    {
+      "iteration": 2,
+      "objective": 3.349470469718068,
+      "gradient_inf": 0.8726059591159648
+    },
+    {
+      "iteration": 3,
+      "objective": 3.3141890566505654,
+      "gradient_inf": 0.8585474161463093
+    },
+    {
+      "iteration": 4,
+      "objective": 3.2711786824234137,
+      "gradient_inf": 0.8403329958803163
+    },
+    {
+      "iteration": 5,
+      "objective": 3.222280364244459,
+      "gradient_inf": 0.8176870748910887
+    },
+    {
+      "iteration": 6,
+      "objective": 3.1719919362540923,
+      "gradient_inf": 0.792146273721884
+    },
+    {
+      "iteration": 7,
+      "objective": 3.134792449999073,
+      "gradient_inf": 0.7624954673899107
+    },
+    {
+      "iteration": 8,
+      "objective": 2.129944094909667,
+      "gradient_inf": 0.5744445046066105
+    },
+    {
+      "iteration": 9,
+      "objective": 1.3357114823613836,
+      "gradient_inf": 0.4578069982864084
+    },
+    {
+      "iteration": 10,
+      "objective": 0.8097536945451788,
+      "gradient_inf": 0.1775406929441268
+    },
+    {
+      "iteration": 11,
+      "objective": 0.7943738474761401,
+      "gradient_inf": 0.1570238695891855
+    },
+    {
+      "iteration": 12,
+      "objective": 0.793279705154441,
+      "gradient_inf": 0.20324051734578563
+    },
+    {
+      "iteration": 13,
+      "objective": 0.7932504905121086,
+      "gradient_inf": 0.21233355891908856
+    }
+  ],
+  "fine_config": {
+    "x_limit": 3.0,
+    "nx": 801,
+    "nt": 480,
+    "clustering": 0.15,
+    "startup_steps": 2
+  },
+  "training_only_optimization_polish": {}
+}

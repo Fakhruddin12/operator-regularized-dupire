@@ -1,231 +1,75 @@
-# Operator-Regularized Inverse Dupire Calibration
+# Operator-Regularized Dupire Calibration
+### Recovering local volatility from sparse option prices
 
-A reproducible Python implementation of a **deterministic-plus-Laplace pipeline** for recovering a local-volatility surface from option prices.
+## Included saved artifacts
 
-The project treats local-volatility calibration as an ill-posed inverse problem. It combines a forward Dupire PDE solver, log-variance parameterisation, weighted nonlinear calibration, a Schrödinger-type regulariser, generalised cross-validation (GCV), and a Laplace approximation for uncertainty quantification.
-
-## Project highlights
-
-- Finite-difference pricing under a two-dimensional local-volatility surface
-- Raw and smoothed direct-Dupire baselines
-- Stable calibration in log-variance, ensuring positive local variance
-- Spatial and maturity regularisation with natural discrete Neumann boundaries
-- Wing- and quote-confidence-dependent potential penalties
-- Linearised and nonlinear damped Gauss–Newton inverse solvers
-- Automatic regularisation-strength selection using GCV
-- Laplace uncertainty bands around the calibrated surface and prices
-- Synthetic recovery benchmarks, repeated-noise experiments, and an SPX case study
-- **52 automated tests** covering the core numerical pipeline
-
-## Why regularisation is needed
-
-Dupire inversion requires derivatives of an option-price surface. Market quotes are sparse and noisy, so direct differentiation amplifies small errors and can create unstable, negative, or undefined local variances.
-
-This project instead parameterises the local variance as
-
-$$
-u(x,T)=\log \sigma_{\mathrm{loc}}^2(x,T),
-\qquad
-\sigma_{\mathrm{loc}}^2(x,T)=e^{u(x,T)},
-$$
-
-and calibrates it through the nonlinear PDE pricing map \(F(u)\):
-
-$$
-\min_u
-\left\|W\bigl(F(u)-C^{\mathrm{obs}}\bigr)\right\|_2^2
-+
-\lambda (u-u_{\mathrm{ref}})^\top R(u-u_{\mathrm{ref}}).
-$$
-
-Here:
-
-- $$(W$$) contains quote weights;
-- $$(u_{\mathrm{ref}})$$ is a fixed reference log-variance surface;
-- $$(\lambda)$$ controls the fit-versus-stability trade-off;
-- $$(R)$$ is the operator regulariser
-
-$$
-R=
-\beta I
-+\alpha_x D_x^\top D_x
-+\alpha_T D_T^\top D_T
-+\mathrm{diag}(V).
-$$
-
-The difference terms penalise roughness across log-moneyness and maturity. The potential \(V\) penalises unsupported corrections more strongly in sparse regions and in the wings. The first-difference construction leaves boundary values free and gives the natural discrete analogue of Neumann boundary conditions.
-
-The regularisation parameter is selected by minimising a GCV score over a candidate grid rather than choosing it manually.
-
-## Pipeline
-
-```mermaid
-flowchart LR
-    A[Option quotes] --> B[Cleaning and normalisation]
-    B --> C[Reference volatility surface]
-    C --> D[Forward Dupire PDE prices]
-    D --> E[Finite-difference Jacobian]
-    B --> F[Quote weights and confidence]
-    F --> G[Operator regulariser]
-    E --> H[GCV selection of lambda]
-    G --> H
-    H --> I[Damped Gauss-Newton calibration]
-    I --> J[Calibrated local-volatility surface]
-    I --> K[Laplace uncertainty approximation]
-    J --> L[Synthetic and market evaluation]
-    K --> L
-```
-
-## Main results
-
-### Final realistic-bumpy synthetic benchmark
-
-The final benchmark uses 136 noisy option quotes and a local-volatility surface containing both a localised positive feature and a secondary dip.
-
-| Method | Local-volatility RMSE | MAE | Valid fraction |
-|---|---:|---:|---:|
-| **Operator-regularised** | **0.00571** | **0.00447** | **1.000** |
-| SSVI + Dupire | 0.01195 | 0.00723 | 1.000 |
-| Smoothed direct Dupire | 0.03683 | 0.01513 | 0.926 |
-| Raw direct Dupire | 0.06163 | 0.02754 | 0.897 |
-
-The operator estimate achieved a feature correlation of **0.910** with the true surface. GCV selected \(\lambda=1000\), and the nonlinear calibration stopped by relative-objective tolerance.
-
-Across ten repeated-noise experiments, the computationally cheaper linearised operator recalibration won all ten comparisons against SSVI:
-
-| Method | Mean RMSE | RMSE standard deviation |
-|---|---:|---:|
-| **Operator-regularised, linearised** | **0.00759** | **0.00101** |
-| SSVI + Dupire | 0.01281 | 0.00141 |
-| Smoothed direct Dupire | 0.03595 | 0.02204 |
-| Raw direct Dupire | 0.04634 | 0.01464 |
-
-### SPX market case study
-
-The real-market experiment is deliberately reported without overstating the result. On a single held-out SPX option snapshot, SSVI produced the better predictive fit:
-
-| Method | Held-out price RMSE | Weighted price RMSE | Implied-volatility RMSE |
-|---|---:|---:|---:|
-| **SSVI** | **1.1703** | **5.2366** | **0.00371** |
-| Operator-regularised | 3.2024 | 8.5954 | 0.00546 |
-
-This does not invalidate the inverse method. The synthetic experiments test local-volatility recovery against known truth, whereas the market experiment tests held-out quote fit on one cross-section. The market result shows that the operator formulation is not automatically superior to a strong parametric volatility-surface model in every setting.
-
-## Repository structure
-
-```text
-.
-├── data/
-│   ├── market/                 # Bundled Cboe sample and prepared SPX quotes
-│   └── synthetic/              # Synthetic benchmark quote sets
-├── notebooks/                  # Fourteen sequential research notebooks
-├── outputs/                    # Validated numerical results and checkpoints
-├── scripts/                    # Long-running Stage 13 and Stage 14 jobs
-├── src/
-│   ├── bayesian/               # Laplace approximation
-│   ├── data/                   # Synthetic and market-data preparation
-│   ├── dupire/                 # Direct Dupire estimators
-│   ├── evaluation/             # Benchmarks, SSVI and diagnostics
-│   ├── inverse/                # Linearised and nonlinear calibration
-│   ├── pricing/                # Black-Scholes and PDE pricing
-│   ├── regularization/         # Operators, potentials and scaling
-│   └── surfaces/               # Grids, smoothing and synthetic surfaces
-├── tests/                      # Automated test suite
-├── requirements.txt
-└── README.md
-```
-
-## Notebook roadmap
-
-| Stage | Notebook | Purpose |
-|---:|---|---|
-| 1 | `01_black_scholes_and_grids.ipynb` | Black-Scholes utilities and numerical grids |
-| 2 | `02_local_vol_pde_pricer.ipynb` | Forward local-volatility PDE solver |
-| 3 | `03_synthetic_data.ipynb` | Controlled synthetic option quotes |
-| 4 | `04_dupire_baselines.ipynb` | Raw and smoothed direct-Dupire baselines |
-| 5 | `05_regularization_operators.ipynb` | Difference operators, potentials and boundary treatment |
-| 6 | `06_linearized_inverse.ipynb` | Weighted linearised inverse problem |
-| 7 | `07_nonlinear_gauss_newton.ipynb` | Damped nonlinear calibration |
-| 8 | `08_tuning_and_diagnostics.ipynb` | Scaling, GCV, ablations and residual diagnostics |
-| 9 | `09_laplace_uncertainty.ipynb` | Surface and predictive uncertainty |
-| 10 | `10_synthetic_benchmark.ipynb` | Smooth synthetic comparison |
-| 11 | `11_localized_bump_stress_test.ipynb` | Localised-feature recovery stress test |
-| 12 | `12_real_option_data_preparation.ipynb` | Offline SPX data preparation |
-| 13 | `13_real_market_model_comparison.ipynb` | Held-out operator-versus-SSVI comparison |
-| 14 | `14_realistic_bumpy_benchmark.ipynb` | Final repeated-noise benchmark |
-
-## Installation
-
-Clone the repository and create a clean environment:
+[calibration-arrays.zip](calibration-arrays.zip) contains 644 original saved files. Extract it at the repository root before using the archived arrays or data snapshots:
 
 ```bash
-git clone https://github.com/Fakhruddin12/operator-regularized-dupire.git
-cd operator-regularized-dupire
-
-conda create -n dupire_env python=3.12 -y
-conda activate dupire_env
-pip install -r requirements.txt
+python -m zipfile -e calibration-arrays.zip .
 ```
 
-## Validation
+Paths and SHA-256 hashes are recorded in [ARTIFACTS.json](ARTIFACTS.json). Source code, figures and result tables remain directly browsable.
 
-Run the complete test suite from the project root:
+**Research question:** Does adding location-dependent penalties to an inverse option-pricing problem improve generalisation and recovery of the underlying volatility surface?
+
+I built a forward Dupire PDE pricer and a regularized calibration pipeline, then compared the proposed penalty with **SSVI, H1/H2 smoothing and unregularized correction** under shared numerical settings.
+
+**Current conclusion:** The broader audit found **mixed pricing improvements and unstable known-truth recovery**. The project demonstrates numerical research, controlled comparisons and critical evaluation; it does not establish universal superiority or novelty.
+
+![Known-truth recovery across ten noise draws](docs/assets/recovery-comparison.png)
+
+[**Results and interpretation**](docs/RESULTS.md) · [**Full audit report**](reports/Dupire_Literature_Audit_Report.pdf) · [**Theory**](reports/Regularizer_Theory.md) · [**Literature comparison**](reports/Literature_Comparison.md)
+
+## The modelling idea
+
+Option quotes are sparse and noisy. Differentiating an interpolated price surface can amplify that noise. Instead, the implementation fits a positive local-variance surface by repricing options through the PDE.
+
+The current audit starts with an SSVI reference and fits a tapered log-variance correction. Smoothness, magnitude and location-dependent penalties control that correction. The comparison keeps the reference, correction coordinates, weights, numerical solver and optimisation budget fixed while changing the penalty.
+
+$$
+\min_h \; \|W(F(u_{\mathrm{ref}}+h)-C_{\mathrm{obs}})\|_2^2+\lambda h^\top R h,
+\qquad \sigma_{\mathrm{loc}}^2=\exp(u).
+$$
+
+Here $F$ is the pricing map and $R$ combines smoothness and potential terms, with the grid scaling defined in the implementation. [The mathematical note](reports/Regularizer_Theory.md) explains the exact linearized risk calculation, the bias–variance trade-off and why stability alone does not guarantee estimation accuracy.
+
+## Current evidence
+
+- **50 outer folds** across literature-linked inputs and synthetic recovery experiments.
+- Separate quote and expiry holdouts, plus numerical and parameter-grid sensitivity checks.
+- On ten known-truth noise draws, full-domain mean local-volatility RMSE was **0.09679** for the full operator versus **0.04096** for SSVI; the operator won **5 of 10** draws.
+- Improvements over H1/H2 depend on the dataset and protocol. The [complete results](docs/RESULTS.md) report the losses as well as the wins.
+
+These are finite-budget comparisons. Many selected correction fits reached the iteration limit. H1/H2 are controlled comparators in the same coordinates, rather than exact reproductions of each paper's implementation. Market quote weights are declared numerical weights; bid–ask spreads were unavailable.
+
+## Reproduce
+
+The archived audit used Python 3.12.14. From the repository root:
 
 ```bash
-python -m pytest tests -q
+python -m pip install -r requirements-audit.txt
+python -m pytest -q
+OPENBLAS_NUM_THREADS=1 python scripts/23_literature_benchmarks.py --inputs data/literature/benchmark_inputs --jobs 6
+OPENBLAS_NUM_THREADS=1 python scripts/24_literature_diagnostics.py --stage outputs/stage_23_literature_audit_final --jobs 3
+OPENBLAS_NUM_THREADS=1 python scripts/25_parameter_grid_sensitivity.py
+OPENBLAS_NUM_THREADS=1 python scripts/26_analyze_literature_results.py
 ```
 
-Expected result:
+The full benchmark is computationally expensive. Saved tables, diagnostics and the report can be inspected immediately. See [input provenance](data/literature/benchmark_inputs/README.md).
 
-```text
-52 passed
-```
+## Where to look
 
-Launch the notebooks with:
+| Location | Purpose |
+|---|---|
+| [src/pricing](src/pricing/) | Forward PDE pricing |
+| [src/inverse](src/inverse/) | Calibration and sensitivities |
+| [src/regularization](src/regularization/) | Operators, grid scaling and potentials |
+| [tests](tests/) | Numerical and implementation checks |
+| [reports/literature_audit](reports/literature_audit/) | Current evidence tables |
+| [outputs/stage_23_literature_audit_final](outputs/stage_23_literature_audit_final/) | Fold-level predictions and diagnostics |
+| [notebooks](notebooks/) | Earlier tutorial and research sequence |
 
-```bash
-jupyter lab
-```
+Earlier stage outputs remain available for traceability and were not all regenerated after the audit fixes. Their favourable synthetic numbers are **historical**, not the current headline evidence. The archived Laplace module is outside the current study's scope. This is a calibration study; trading profitability is not evaluated.
 
-Run the notebooks in numerical order. Several notebooks include validated stored outputs, so the results can be inspected without repeating every expensive calibration.
-
-## Long-running scripts
-
-The longer market and final-benchmark calculations are also available as standalone scripts:
-
-```bash
-python scripts/13a_tune_real_market.py --project-root .
-python scripts/13b_fit_compare_real_market.py --project-root .
-python scripts/14_run_realistic_bumpy_benchmark.py --project-root . --mode full
-```
-
-Use `--mode quick` for a reduced Stage 14 diagnostic run. Add `--overwrite` only when intentionally replacing existing Stage 14 results.
-
-## Surface convention
-
-All surfaces have shape
-
-```text
-(number of maturities, number of log-moneyness points)
-```
-
-Rows correspond to maturities and columns to log-moneyness. Arrays are flattened in C order, so log-moneyness varies fastest.
-
-## Scope and limitations
-
-- The primary evidence is based on controlled synthetic recovery experiments.
-- The market study uses one SPX snapshot and should not be interpreted as broad empirical dominance.
-- The Jacobian is constructed by finite differences, which is transparent but computationally expensive.
-- The Laplace approximation is local and approximately Gaussian around the calibrated solution.
-- This repository is a research and educational implementation, not a production trading or risk system.
-
-## Author
-
-**Fakhruddin Hussain**  
-MSc Statistics with Data Science, University of Edinburgh  
-Quantitative research portfolio project
-
-## References
-
-- Dupire, B. (1994). *Pricing with a Smile*. Risk.
-- Gatheral, J. and Jacquier, A. (2014). *Arbitrage-free SVI volatility surfaces*. Quantitative Finance.
+**Author:** Fakhruddin Hakim Hussain · [Portfolio](https://github.com/Fakhruddin12)

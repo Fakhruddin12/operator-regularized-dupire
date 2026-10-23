@@ -1,0 +1,6 @@
+{
+  "max_abs_difference": 4.708897590781618e-06,
+  "rmse_difference": 7.454903916949035e-07,
+  "price_noise_sd_mean": 0.0015855435240815872,
+  "note": "Published local-volatility truth/grid/noise; S0 known and fixed at 1; new noise seeds. Independent finer generation grid. Not the authors original random realization or spot-adjustment experiment."
+}

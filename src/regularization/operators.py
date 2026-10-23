@@ -144,7 +144,7 @@ def build_regularization_matrix(
     potential: np.ndarray | None = None,
 ) -> tuple[csc_matrix, csc_matrix, csc_matrix]:
     """Build ``R`` together with the difference operators used to form it."""
-    if alpha_x < 0 or alpha_T < 0 or beta < 0:
+    if not np.all(np.isfinite([alpha_x, alpha_T, beta])) or alpha_x < 0 or alpha_T < 0 or beta < 0:
         raise ValueError("alpha_x, alpha_T, and beta must be non-negative.")
 
     D_x, D_T = build_2d_difference_operators(

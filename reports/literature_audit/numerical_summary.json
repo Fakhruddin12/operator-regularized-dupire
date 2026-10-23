@@ -1,0 +1,16 @@
+{
+  "completed_folds": 50,
+  "diagnosed_folds": 50,
+  "convexity_violations": 0,
+  "calendar_violations": 0,
+  "minimum_time_value": -1.7763568394002505e-15,
+  "max_refinement_rmse": 8.675902660499409e-06,
+  "max_domain_rmse": 1.7055104344481903e-06,
+  "selected_correction_fits": 250,
+  "selected_fits_at_iteration_budget": 72,
+  "selected_fits_with_active_bounds": 117,
+  "max_selected_bound_fraction": 0.17142857142857143,
+  "selected_lambdas_at_search_boundary": 11,
+  "training_only_polished_fits": 72,
+  "polished_optimizer_success": 3
+}

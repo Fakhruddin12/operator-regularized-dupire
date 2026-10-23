@@ -1,0 +1,12 @@
+{
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "scipy": "1.17.0",
+  "pandas": "2.2.3",
+  "pytest": "9.1.1",
+  "matplotlib": "3.10.8",
+  "reportlab": "4.4.9",
+  "Pillow": "12.3.0",
+  "requests": "2.34.2",
+  "blas_threads": 1
+}

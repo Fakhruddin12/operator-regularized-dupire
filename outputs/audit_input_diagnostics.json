@@ -1,0 +1,86 @@
+[
+  {
+    "dataset": "albani_noise_00",
+    "n": 155,
+    "below_intrinsic": 34,
+    "above_one": 0,
+    "nonfinite_iv": 34
+  },
+  {
+    "dataset": "albani_noise_01",
+    "n": 155,
+    "below_intrinsic": 27,
+    "above_one": 0,
+    "nonfinite_iv": 27
+  },
+  {
+    "dataset": "albani_noise_02",
+    "n": 155,
+    "below_intrinsic": 34,
+    "above_one": 0,
+    "nonfinite_iv": 34
+  },
+  {
+    "dataset": "albani_noise_03",
+    "n": 155,
+    "below_intrinsic": 23,
+    "above_one": 0,
+    "nonfinite_iv": 23
+  },
+  {
+    "dataset": "albani_noise_04",
+    "n": 155,
+    "below_intrinsic": 37,
+    "above_one": 0,
+    "nonfinite_iv": 37
+  },
+  {
+    "dataset": "albani_noise_05",
+    "n": 155,
+    "below_intrinsic": 32,
+    "above_one": 0,
+    "nonfinite_iv": 32
+  },
+  {
+    "dataset": "albani_noise_06",
+    "n": 155,
+    "below_intrinsic": 33,
+    "above_one": 0,
+    "nonfinite_iv": 33
+  },
+  {
+    "dataset": "albani_noise_07",
+    "n": 155,
+    "below_intrinsic": 27,
+    "above_one": 0,
+    "nonfinite_iv": 27
+  },
+  {
+    "dataset": "albani_noise_08",
+    "n": 155,
+    "below_intrinsic": 33,
+    "above_one": 0,
+    "nonfinite_iv": 33
+  },
+  {
+    "dataset": "albani_noise_09",
+    "n": 155,
+    "below_intrinsic": 26,
+    "above_one": 0,
+    "nonfinite_iv": 26
+  },
+  {
+    "dataset": "bates_author",
+    "n": 324,
+    "below_intrinsic": 0,
+    "above_one": 0,
+    "nonfinite_iv": 0
+  },
+  {
+    "dataset": "eurostoxx_2010",
+    "n": 155,
+    "below_intrinsic": 0,
+    "above_one": 0,
+    "nonfinite_iv": 0
+  }
+]

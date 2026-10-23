@@ -1,0 +1,19 @@
+{
+  "experiment": "SSVI continuous local-vol prior + compact tapered operator correction",
+  "panel_quotes": 1043,
+  "outer_train_quotes": 840,
+  "outer_test_quotes": 203,
+  "selected_lambda": 1000.0,
+  "pde": {
+    "pde_x_min": -1.0,
+    "pde_x_max": 1.0,
+    "number_of_pde_x_points": 301,
+    "number_of_time_steps": 600,
+    "theta": 0.5
+  },
+  "iterations": 4,
+  "stop_reason": "relative_objective_tolerance",
+  "correction_min": -0.5282636987775857,
+  "correction_max": 2.176179777742868,
+  "interpretation": "One-date nested cross-sectional calibration. It does not establish time-series robustness, execution quality, hedging performance, or trading profitability."
+}

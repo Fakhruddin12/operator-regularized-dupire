@@ -1,0 +1,11 @@
+{
+  "status": "complete",
+  "completed_folds": 50,
+  "planned_folds": 50,
+  "diagnosed_folds": 50,
+  "sensitivity_refits": 3,
+  "tests_passed": 61,
+  "report": "reports/Dupire_Literature_Audit_Report.pdf",
+  "completed_at": "2026-10-23T01:45:32.067296+05:30",
+  "interpretation": "No consistent superiority or novelty established; known-truth recovery is unstable; finite optimization budget limits the comparison."
+}

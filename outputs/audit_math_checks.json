@@ -1,0 +1,39 @@
+{
+  "regularizers": {
+    "h1": {
+      "symmetry_error": 0.0,
+      "minimum_eigenvalue": 4.752195346164571e-05,
+      "maximum_eigenvalue": 2.4630588866407637
+    },
+    "h1_density": {
+      "symmetry_error": 0.0,
+      "minimum_eigenvalue": 0.04951082986355273,
+      "maximum_eigenvalue": 2.3689553395335397
+    },
+    "h1_wing": {
+      "symmetry_error": 0.0,
+      "minimum_eigenvalue": 0.02234447010232441,
+      "maximum_eigenvalue": 2.37054806374691
+    },
+    "operator_full": {
+      "symmetry_error": 0.0,
+      "minimum_eigenvalue": 0.05463154363478535,
+      "maximum_eigenvalue": 2.2896720140693247
+    },
+    "h2": {
+      "symmetry_error": 0.0,
+      "minimum_eigenvalue": 9.901728543189178e-08,
+      "maximum_eigenvalue": 3.0065231990238623
+    }
+  },
+  "pchip_counterexample": {
+    "time": 2.0,
+    "old_theta": 0.03977027027027026,
+    "old_derivative": -0.03783783783783789,
+    "fixed_theta": 0.062000000000000006,
+    "fixed_derivative": 0.0050000000000000044
+  },
+  "old_constant_integral_6_by_11": 1.32,
+  "new_constant_integral": 1.0,
+  "tests": 61
+}

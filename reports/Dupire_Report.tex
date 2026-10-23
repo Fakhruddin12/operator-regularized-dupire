@@ -1,0 +1,366 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,top=25mm,bottom=25mm,left=27mm,right=27mm,headheight=15pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{charter}
+\usepackage[scaled=.92]{helvet}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{graphicx,booktabs,array,tabularx,threeparttable}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor,microtype,fancyhdr,caption,subcaption,enumitem,titlesec,hyperref,float}
+\definecolor{navy}{HTML}{16334B}\definecolor{teal}{HTML}{13798A}\definecolor{pale}{HTML}{EFF5F6}\definecolor{rust}{HTML}{A95135}\definecolor{midgrey}{HTML}{52616B}
+\hypersetup{colorlinks=true,linkcolor=teal,urlcolor=teal,citecolor=teal,pdftitle={Operator-Regularized Inverse Calibration of Dupire Local Volatility},pdfauthor={Fakhruddin Hakim Hussain}}
+\titleformat{\section}{\sffamily\Large\bfseries\color{navy}}{\thesection}{.7em}{}[\vspace{2pt}\titlerule]
+\titleformat{\subsection}{\sffamily\large\bfseries\color{teal}}{\thesubsection}{.7em}{}
+\titleformat{\subsubsection}{\sffamily\normalsize\bfseries\color{midgrey}}{\thesubsubsection}{.7em}{}
+\titlespacing*{\section}{0pt}{2.0em}{.8em}\titlespacing*{\subsection}{0pt}{1.35em}{.45em}\titlespacing*{\subsubsection}{0pt}{1em}{.3em}
+\setlength{\parindent}{1.25em}\setlength{\parskip}{.2em}\linespread{1.075}
+\setlength{\abovedisplayskip}{13pt plus 3pt minus 2pt}\setlength{\belowdisplayskip}{13pt plus 3pt minus 2pt}\setlength{\abovedisplayshortskip}{9pt plus 2pt}\setlength{\belowdisplayshortskip}{9pt plus 2pt}\setlength{\jot}{6pt}
+\setlist[itemize]{leftmargin=1.5em,itemsep=3pt,topsep=5pt}
+\captionsetup{font=small,labelfont=bf,skip=7pt}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\sffamily\color{midgrey}Operator-Regularized Dupire Calibration}\fancyhead[R]{\small\sffamily\color{midgrey}Research Report}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{.35pt}
+\newtcolorbox{scopebox}{colback=pale,colframe=teal,boxrule=.6pt,arc=1.5mm,left=3mm,right=3mm,top=2mm,bottom=2mm}
+\newtcolorbox{warningbox}{colback=white,colframe=rust,boxrule=.75pt,arc=1.5mm,left=3mm,right=3mm,top=2mm,bottom=2mm}
+\newcommand{\R}{\mathbb{R}}\newcommand{\E}{\mathbb{E}}\newcommand{\Var}{\operatorname{Var}}\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\begin{document}
+\begin{titlepage}
+\thispagestyle{empty}
+\vspace*{28mm}
+{\sffamily\small\color{teal}\textbf{QUANTITATIVE FINANCE \quad|\quad NUMERICAL METHODS}\par}
+\vspace{13mm}
+{\sffamily\bfseries\color{navy}\fontsize{27}{33}\selectfont Operator-Regularized Inverse\\[3pt] Calibration of Dupire\\[3pt] Local Volatility\par}
+\vspace{8mm}
+{\color{teal}\rule{28mm}{2pt}\par}
+\vspace{7mm}
+{\large\color{midgrey}A PDE-constrained approach to stabilizing volatility-surface recovery\par}
+\vfill
+{\sffamily\large\textbf{Fakhruddin Hakim Hussain}\par}
+\vspace{2mm}
+{\sffamily\normalsize Independent research project\par}
+\vspace{10mm}
+{\small October 2026\par}
+\end{titlepage}
+
+\pagenumbering{roman}
+\section*{Abstract}
+The Dupire forward equation provides a link between a sufficiently regular European option price surface and the local-volatility function of a one-factor risk-neutral diffusion. Direct use of the Dupire formula is numerically fragile because it differentiates noisy, discretely observed prices, including a second derivative in strike. We instead parameterize log local variance on a coarse grid and calibrate it by solving the forward pricing PDE, minimizing weighted quote error together with a structured regularization penalty.
+
+The penalty is represented by a positive discrete operator containing magnitude, log-moneyness smoothness, maturity smoothness, and spatially varying wing and quote-confidence terms. Its gradient-plus-potential quadratic form has a formal resemblance to the energy form of a Schr\"odinger Hamiltonian; this is a regularization analogy and not a quantum-mechanical model. On a controlled synthetic surface with localized features, the nonlinear operator method attains local-volatility RMSE 0.00571 on 120 common evaluation points, versus 0.01195 for SSVI--Dupire. Across ten paired noise draws, the linearized operator variant has lower RMSE on every draw. On one SPX cross-section, a continuous SSVI--Dupire prior plus a compact, tapered PDE-calibrated correction reduces held-out weighted price RMSE from 5.237 to 0.579 and places 94.6\% of holdout prices inside bid--ask. A stricter leave-one-expiry-out diagnostic reverses that result: the nonlinear correction has pooled weighted price RMSE 8.137 versus 6.089 for a PDE-matched SSVI baseline and wins on only three of eight expiry folds. The two tests measure different forms of generalization; neither establishes performance across dates or trading profitability.
+
+\textbf{Keywords:} Dupire local volatility; inverse problems; PDE-constrained optimization; operator regularization; SSVI; option calibration.
+
+\section*{Preface and scope}
+This report documents the mathematical formulation, numerical implementation, evaluation design, and limitations of the accompanying project. The central object is a cross-sectional risk-neutral calibration: local volatility is inferred from option prices observed at a valuation date. The market test in this report is a quote holdout from one date; it is not a chronological forecast evaluation. The scope is model recovery and pricing fit, not strategy design.
+
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+\subsection{Motivation}
+An implied-volatility surface summarizes market option prices across strike and maturity. Local volatility offers a one-factor diffusion whose risk-neutral European prices can reproduce such a surface, providing a tractable framework for pricing and scenario analysis \cite{Dupire1994,DermanKani1994}. Its practical weakness is that recovering the local-volatility function requires derivatives of the option surface. With sparse market quotes, numerical differentiation can turn small price perturbations into large changes in inferred local variance.
+
+The research question is therefore not whether Dupire's identity holds in the ideal continuous setting, but how to recover a stable, positive local-volatility surface from finite, noisy quotes while retaining features that are actually supported by the data. This project addresses that question with a PDE-constrained inverse problem and a structured penalty that varies across the calibration domain.
+
+\subsection{Contributions}
+The project makes four implementation-level contributions: (i) an inverse calibration in log-variance coordinates, with prices generated by a finite-difference solution of the forward Dupire PDE; (ii) a positive anisotropic difference operator augmented by wing and quote-density potentials; (iii) a full-domain SSVI--Dupire prior with a compact, tapered correction calibrated by nonlinear PDE repricing; and (iv) evaluation on a known synthetic truth and a nested same-date SPX quote holdout, with limitations stated explicitly.
+
+\subsection{Organization}
+Section~\ref{sec:background} introduces local volatility and the forward pricing equation. Section~\ref{sec:inverse} states the inverse problem. Section~\ref{sec:regularizer} develops the operator penalty and its Hamiltonian analogy. Section~\ref{sec:numerics} describes the solver. Sections~\ref{sec:synthetic} and~\ref{sec:market} report synthetic and market experiments; Sections~\ref{sec:discussion} and~\ref{sec:conclusion} discuss limitations and conclusions.
+
+\section{Local-volatility model and forward equation}\label{sec:background}
+\subsection{Risk-neutral dynamics}
+Under a risk-neutral measure $\mathbb{Q}$, assume the underlying $S_t$ follows
+\begin{equation}\label{eq:sde}
+  dS_t=(r-q)S_t\,dt+\sigma_{\mathrm{loc}}(S_t,t)S_t\,dW_t^{\mathbb Q},
+\end{equation}
+where $r$ and $q$ denote constant interest and dividend yields for exposition. The local-volatility coefficient is a deterministic function of state and time. It is calibrated to a valuation-date option surface; it is not, by construction, the physical-measure forecast of future realized volatility.
+
+\subsection{Dupire forward PDE and formula}
+Let $C(K,T)$ be the time-zero price of a European call with strike $K$ and maturity $T$. Under regularity and boundary conditions, the forward equation is
+\begin{equation}\label{eq:forward}
+ \frac{\partial C}{\partial T}
+ =\frac{1}{2}\sigma_{\mathrm{loc}}^2(K,T)K^2\frac{\partial^2 C}{\partial K^2}
+ -(r-q)K\frac{\partial C}{\partial K}-qC.
+\end{equation}
+Solving for local variance gives the Dupire identity \cite{Dupire1994,DermanKani1994}
+\begin{equation}\label{eq:dupire}
+ \sigma_{\mathrm{loc}}^2(K,T)=
+ \frac{C_T+(r-q)KC_K+qC}{\tfrac12K^2C_{KK}}.
+\end{equation}
+The denominator is proportional to strike curvature. Since a call price is convex in strike, this term is nonnegative in an arbitrage-consistent continuum surface, but finite-difference estimates of $C_{KK}$ can become small, noisy, or negative. Maturity differentiation introduces an additional source of instability. Thus the direct quotient in \eqref{eq:dupire} is sensitive to interpolation, quote noise, and boundary treatment.
+
+\subsection{Coordinates and positivity}
+We use forward log-moneyness and log variance,
+\begin{equation}\label{eq:coords}
+ x=\log\!\left(\frac{K}{F(T)}\right),\qquad
+ u(x,T)=\log\sigma_{\mathrm{loc}}^2(x,T),\qquad
+ \sigma_{\mathrm{loc}}(x,T)=\exp\!\left(\frac{u(x,T)}{2}\right).
+\end{equation}
+The exponential map enforces positive variance without imposing a pointwise inequality constraint in the optimizer. Log-moneyness organizes the surface relative to the forward and is used consistently in the regularization grid.
+
+\section{PDE-constrained inverse calibration}\label{sec:inverse}
+\subsection{Observation model and weighted loss}
+Let $y\in\R^n$ be observed option prices, $F(u)$ the vector of prices returned by the forward PDE solver, and $W$ a diagonal quote-weight matrix with $W_{ii}=1/s_i$, where $s_i$ is the quote's price-noise scale. This gives inverse-variance weighting in the squared loss. The calibration minimizes
+\begin{equation}\label{eq:objective}
+ \widehat u_\lambda=\underset{u}{\operatorname{argmin}}\;
+ \left\{
+ \underbrace{\norm{W(F(u)-y)}_2^2}_{\text{weighted price residual}}
+ +\lambda\underbrace{(u-u_{\mathrm{ref}})^\top R(u-u_{\mathrm{ref}})}_{\text{regularization}}
+ \right\}.
+\end{equation}
+Here $u_{\mathrm{ref}}$ is a reference log-variance surface; $R$ is positive definite or positive semidefinite with a small positive magnitude term; and $\lambda>0$ controls the fit--stability tradeoff. The quote weighting is intended to account for differences in quote uncertainty, rather than to make every mid-price equally influential.
+
+\subsection{Why solve the forward PDE?}
+The direct Dupire quotient differentiates the fitted call surface twice in strike. The inverse formulation instead proposes a candidate local-volatility surface, solves the pricing PDE, and compares model prices with quotes. It replaces explicit unstable differentiation of market prices with an optimization problem whose stability can be controlled by the penalty. It does not eliminate model risk: the result still depends on the PDE discretization, parameterization, quote weights, regularization, and boundary conditions.
+
+\section{Structured operator regularization}\label{sec:regularizer}
+\subsection{Discrete operator and quadratic form}
+Let $h=u-u_{\mathrm{ref}}$ be the correction to the reference surface, flattened from a grid in normalized coordinates $(\xi,\tau)\in[0,1]^2$. Let $D_\xi$ and $D_\tau$ be first-difference matrices along log-moneyness and maturity. Define
+\begin{equation}\label{eq:R}
+ R=\beta I+\alpha_\xi D_\xi^\top D_\xi+
+   \alpha_\tau D_\tau^\top D_\tau+\operatorname{diag}(V),
+\end{equation}
+where $\beta>0$, $\alpha_\xi,\alpha_\tau\geq0$, and $V_j\geq0$. The penalty expands as
+\begin{equation}\label{eq:energy-discrete}
+ h^\top Rh=\beta\norm{h}_2^2+
+ \alpha_\xi\norm{D_\xi h}_2^2+
+ \alpha_\tau\norm{D_\tau h}_2^2+
+ \sum_jV_jh_j^2.
+\end{equation}
+The two difference terms penalize rapid variation in the corresponding coordinate; the magnitude term anchors the solution; and the potential penalizes corrections selectively by location. This is a quadratic (Tikhonov-type) regularization of a discretized inverse problem \cite{TikhonovArsenin1977}. First differences imply the natural discrete analogue of zero-flux (Neumann-type) boundary behavior.
+
+\subsection{Spatial potential}
+The implemented potential is a sum of nonnegative components,
+\begin{equation}\label{eq:potential}
+ V(x,T)=V_{\mathrm{wing}}(x)+V_{\mathrm{conf}}(x,T),\qquad
+ V_{\mathrm{conf}}=\eta\bigl(1-c(x,T)\bigr)^p,
+\end{equation}
+where $c(x,T)\in[0,1]$ is a smooth estimate of quote support. The wing term increases outside a specified central log-moneyness region; the confidence term increases as local quote density falls. This encodes a cautious prior: where data are sparse, the fitted correction is discouraged from moving freely. It does not mean that low-confidence regions are known to have low volatility.
+
+\subsection{Hamiltonian-inspired interpretation}
+A one-particle Schr\"odinger Hamiltonian has the schematic form \cite{Griffiths2018}
+\begin{equation}\label{eq:schrodinger}
+ \widehat H=-\frac{\hbar^2}{2m}\nabla^2+V.
+\end{equation}
+Its energy quadratic form combines a gradient contribution with a potential contribution. The continuum analogue of \eqref{eq:energy-discrete}, after scaling the grid to a unit square, is
+\begin{equation}\label{eq:energy-continuous}
+ \mathcal{E}[h]\simeq\int_{[0,1]^2}\!\left[
+ \beta h^2+\alpha_\xi\left|\frac{\partial h}{\partial\xi}\right|^2+
+ \alpha_\tau\left|\frac{\partial h}{\partial\tau}\right|^2+Vh^2
+ \right]d\xi\,d\tau.
+\end{equation}
+The resemblance is structural: derivative penalties suppress oscillatory corrections, while a spatial potential changes the local cost. It motivates the operator form but does not introduce quantum physics into option pricing.
+
+\begin{warningbox}
+\textbf{Interpretation boundary.} The correction $h$ is not a quantum wavefunction; $(x,T)$ are calibration coordinates; maturity is not physical Schr\"odinger evolution time; and the algorithm does not simulate a quantum system. The Hamiltonian connection is a design analogy for a positive smoothness-plus-potential penalty.
+\end{warningbox}
+
+\subsection{Regularization selection}
+For synthetic experiments, $\lambda$ is selected on a logarithmic grid using generalized cross-validation (GCV), a smoothing-parameter selection method introduced by Craven and Wahba \cite{CravenWahba1979}, schematically
+\begin{equation}\label{eq:gcv}
+ \operatorname{GCV}(\lambda)=
+ \frac{n\,\norm{W(y-\widehat y_\lambda)}_2^2}
+ {\left[n-\operatorname{df}_{\mathrm{eff}}(\lambda)\right]^2}.
+\end{equation}
+The real-market study selects $\lambda$ on an inner validation split, and reports results on a separate outer quote holdout. This nested split is essential: choosing $\lambda$ on the reported test quotes would make the test score optimistic.
+
+\section{Numerical method}\label{sec:numerics}
+\subsection{Forward pricing solver}
+The local-volatility forward PDE is discretized on strike and time grids using a Crank--Nicolson scheme with $\theta=1/2$. The initial condition is the call payoff $C(K,0)=(S_0-K)^+$. Standard low- and high-strike call boundary conditions are used. A coarse grid of log-variance parameters is interpolated for PDE evaluation. Since volatility varies with strike/state and maturity, a constant-volatility Black--Scholes closed form is not the pricing solver for a general candidate surface.
+
+\subsection{Damped Gauss--Newton iteration}
+For a current iterate $u$, let $J=\partial F(u)/\partial u$ be the price Jacobian, approximated by finite differences. A damped Gauss--Newton step solves
+\begin{equation}\label{eq:GN}
+ \left(J^\top W^\top WJ+\lambda R+\mu I\right)\delta
+ =J^\top W^\top W\bigl(y-F(u)\bigr)-\lambda R(u-u_{\mathrm{ref}}),
+\end{equation}
+where $\mu I$ stabilizes the local linear system. A backtracking line search accepts a proposed step only when the full nonlinear objective in \eqref{eq:objective} decreases. Thus an improvement in the local quadratic approximation alone is insufficient for acceptance.
+
+\subsection{Implementation settings}
+The final synthetic calibration uses a $6\times11$ grid (66 unknowns) and 136 quotes. Smoothness coefficients are $\alpha_\xi=0.005$, $\alpha_\tau=0.002$, and $\beta=10^{-4}$. The synthetic wing potential begins at $|x|=0.20$ with strength $0.20$ and power 2; the quote-confidence penalty has strength $0.20$. GCV selects $\lambda=1000$ in the reported run. These settings are experiment-specific, not universal hyperparameters.
+
+\section{Experimental design}\label{sec:design}
+\subsection{Comparators and metrics}
+The local-volatility estimators compared are raw direct Dupire, smoothed direct Dupire, an SSVI-implied surface differentiated through Dupire, and the PDE-constrained operator-regularized method. For the synthetic setting, the target is known local volatility, so the primary metric is pointwise RMSE, with MAE and estimator coverage also reported. All four methods are scored on 120 common grid points; this common-support restriction avoids rewarding a method merely for failing to return estimates at difficult locations.
+
+For the market panel, the primary metrics are call-price RMSE in index points, spread-weighted price RMSE, implied-volatility RMSE, and the fraction of predictions inside the quoted bid--ask interval. These assess cross-sectional quote reproduction; they are not trading KPIs.
+
+\subsection{Synthetic truth and noise}
+The controlled synthetic surface contains a baseline term, a broad localized event elevation, a medium-maturity dip, and a short-dated downside ridge. Noisy option prices are generated at 136 quote locations. Because the true generating local-volatility surface is known, recovery error can be measured directly, rather than inferred from quote fit alone.
+
+\section{Synthetic recovery results}\label{sec:synthetic}
+\subsection{Three-dimensional surface recovery}
+Figure~\ref{fig:synth3d} compares the known generating surface with the operator estimate. Axes are shown as forward log-moneyness and maturity; the shared color scale encodes local-volatility level. The black markers indicate the discrete evaluation locations; calibration itself uses a coarser $6\times11$ parameter grid. The estimate reproduces the broad event feature but is not identical to the truth, especially where the grid and quote support constrain detail.
+\begin{figure}[tbp]
+ \centering\includegraphics[width=\textwidth]{figures/synthetic_3d_surfaces.pdf}
+ \caption{Synthetic local-volatility surface and recovered estimate. Both panels use the same axes, vertical scale, and color scale. Markers show grid/quote locations; the smooth rendering between them is visual interpolation.}\label{fig:synth3d}
+\end{figure}
+
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.83\textwidth]{figures/synthetic_3d_error.pdf}
+ \caption{Absolute local-volatility recovery error on the 120-point common evaluation support. The triangulated display connects sampled evaluation locations for visualization and is not an additional model fit.}\label{fig:syntherr}
+\end{figure}
+
+\subsection{Single synthetic realization}
+\begin{table}[tbp]
+\centering\small
+\caption{Synthetic local-volatility recovery on 120 common evaluation points. Coverage is the fraction of each method's full target grid for which an estimate is available.}\label{tab:synth}
+\begin{tabular}{lrrr}\toprule
+Method & RMSE & MAE & Coverage\\\midrule
+Operator-regularized inverse & 0.005707 & 0.004472 & 100.00\%\\
+SSVI--Dupire & 0.011951 & 0.007231 & 100.00\%\\
+Smoothed direct Dupire & 0.036831 & 0.015126 & 92.65\%\\
+Raw direct Dupire & 0.061627 & 0.027544 & 89.71\%\\\bottomrule\end{tabular}
+\end{table}
+On this realization, operator-regularized RMSE is about 52\% lower than SSVI--Dupire RMSE on the common support. This advantage is conditional on the synthetic surface design, noise, quote layout, grid, and parameter selection. Figure~\ref{fig:synthbench} shows the scale of the comparison.
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.82\textwidth]{figures/synthetic_rmse.pdf}
+ \caption{Synthetic local-volatility RMSE on the common support; lower values indicate more accurate recovery.}\label{fig:synthbench}
+\end{figure}
+
+\subsection{Repeated-noise experiment}
+Ten independent noise perturbations were evaluated. The operator method in this experiment is the linearized calibration variant, so it should not be treated as exactly the same estimator as the nonlinear single-realization result. Mean RMSE (standard deviation) was 0.007587 (0.001011) for the linearized operator method and 0.012812 (0.001412) for SSVI--Dupire. Comparing methods pairwise on the same ten noise seeds, operator RMSE was lower on all ten. The mean paired reduction, defined as SSVI RMSE minus operator RMSE, was 0.005225; its nominal 95\% paired $t$ interval was [0.004168, 0.006282], under the usual normality assumption for paired differences. This interval describes uncertainty under this simulator only.
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.80\textwidth]{figures/paired_noise.pdf}
+ \caption{Paired local-volatility RMSE by noise seed. Each line connects the two methods on the same simulated quote perturbation; the operator calibration is linearized.}\label{fig:noise}
+\end{figure}
+This repeated-noise result is evidence of stability under the simulator's perturbation mechanism, not market robustness. Ten draws are too few to characterize tail behavior or justify market-generalization claims.
+
+\subsection{GCV diagnostic}
+The selected regularization level in the final synthetic run is $\lambda=1000$. Figure~\ref{fig:gcv} shows the GCV curve over the tested grid.
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.78\textwidth]{figures/gcv_lambda.pdf}
+ \caption{Generalized cross-validation score over candidate regularization strengths for the synthetic quote panel.}\label{fig:gcv}
+\end{figure}
+
+\section{SPX market cross-section}\label{sec:market}
+\subsection{Data and nested split}
+The market example uses the Cboe SPX Option EOD Summary 15:45 U.S. Eastern snapshot dated 25 August 2023; Cboe describes an additional 15:45 snapshot for option quotes and related calculations \cite{CboeEOD}. After cleaning and conversion to out-of-the-money-sourced call-equivalent prices, the prepared data contain 5,092 quotes across 37 expiries. The focused panel restricts maturity to 0.08--1.10 years and $|\log(K/F)|\leq0.25$, giving 1,043 quotes across eight expiries. A deterministic within-expiry, log-moneyness-spread split yields 840 outer training and 203 outer test quotes.
+
+Within outer training, every fifth quote ordered by log-moneyness within expiry is reserved for inner validation; 673 quotes remain for the inner fit. Candidate regularization levels are selected by nonlinear PDE repricing on the inner validation subset, giving $\lambda=1000$. The outer test is untouched during selection. This is a quote-level split from one date, not a chronological forecast test. Neighboring strikes from one expiry may lie in both fit and test subsets, so this split tests interpolation/repricing on a known surface rather than independence across dates or regimes.
+
+\subsection{Why the first market formulation failed}
+The initial market inverse problem used a constant-volatility reference and a tabulated local-volatility surface. Although the optimization converged, it was materially worse than SSVI on both the training and test quotes. Grid-sensitivity diagnostics showed that flat extrapolation of a narrow local-volatility grid was inadequate for a pricing PDE that evaluates a wider state domain. We retain this result as an ablation rather than presenting it as the final method. The revised formulation uses a continuous full-domain SSVI--Dupire local-volatility callback, so the reference model is evaluated consistently over the PDE domain. A later leave-one-expiry-out test shows that this correction does not reliably transfer to maturities omitted from fitting.
+
+\subsection{SSVI-centered correction}
+Let $\sigma_{\mathrm{SSVI,loc}}(x,T)$ be the continuous local-volatility function obtained by differentiating the fitted SSVI total-variance surface through Dupire. We parameterize a correction $h$ in log-variance coordinates and define
+\begin{equation}
+\sigma_{\mathrm{loc}}(x,T)=\sigma_{\mathrm{SSVI,loc}}(x,T)\exp\!\left[\frac{1}{2}q_x(x)q_T(T)h(x,T)\right],
+\label{eq:ssvi-correction}
+\end{equation}
+where $q_x$ and $q_T$ are smooth tapers that force the correction to zero outside its supported region. The correction is represented on a $10\times25$ grid over $T\in[0,1.2]$ years and $x\in[-0.5,0.5]$; the PDE is solved on $x\in[-1,1]$ with 301 spatial points and 600 time steps. The objective combines inverse-noise-weighted quote residuals with the same structured positive operator penalty used in the project. Thus the flexible component adjusts a stable, market-shaped prior only where the correction has support, while the base model remains defined across the pricing domain.
+
+This is an inverse-pricing estimator, not a standalone trading signal. The selected correction may improve reproduction of held-out quotes from the same surface; it does not imply that future option returns are predictable.
+
+\begin{figure}[tbp]
+ \centering\includegraphics[width=\textwidth]{figures/spx_3d_surfaces.pdf}
+ \caption{SSVI--Dupire prior and corrected local-volatility surface on the full PDE state domain. Both panels use the same axes and color scale. The learned correction is tapered outside quote support.}
+ \label{fig:spx3d}
+\end{figure}
+
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.82\textwidth]{figures/spx_correction_map.pdf}
+ \caption{Effective tapered correction to log variance, with outer training quotes overlaid. The plotted correction is $2\log(\sigma_{\mathrm{corrected}}/\sigma_{\mathrm{SSVI,loc}})$.}
+ \label{fig:correction}
+\end{figure}
+
+\subsection{Held-out quote performance}
+\begin{table}[tbp]
+\centering\small
+\caption{SPX quote repricing on the same-date calibration panel. Price RMSE is in index points; weighted RMSE uses inverse quote-noise scales; IV RMSE is in volatility units.}
+\label{tab:market}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrr}\toprule
+Model & Split & $n$ & Price RMSE & Weighted RMSE & IV RMSE & Inside bid--ask\\\midrule
+SSVI--Dupire & Train & 840 & 1.1889 & 5.3072 & 0.004460 & 28.21\%\\
+SSVI + operator correction & Train & 840 & 0.1053 & 0.5225 & 0.001009 & 95.71\%\\
+Constant-reference operator (ablation) & Train & 840 & 3.1105 & 8.7360 & 0.007074 & 18.93\%\\
+SSVI--Dupire & Test & 203 & 1.1703 & 5.2366 & 0.003709 & 26.60\%\\
+SSVI + operator correction & Test & 203 & 0.1186 & 0.5788 & 0.000630 & 94.58\%\\
+Constant-reference operator (ablation) & Test & 203 & 3.0894 & 8.4431 & 0.005445 & 19.21\%\\\bottomrule
+\end{tabular}}
+\end{table}
+The revised correction lowers outer-test weighted RMSE by 88.9\% relative to SSVI and increases the inside-bid--ask fraction from 26.6\% to 94.6\%. It also wins on each of the eight expiry slices. The paired expiry-cluster bootstrap interval for the mean reduction in weighted squared error is [13.15, 43.55] over 20,000 resamples. This interval is descriptive: there are only eight expiry clusters and one valuation date, so it cannot support claims of time-series significance or market-wide superiority. Figure~\ref{fig:holdout} shows the test implied-volatility fit, and Figure~\ref{fig:expiry} displays expiry-level weighted errors.
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.86\textwidth]{figures/spx_holdout_iv.pdf}
+ \caption{Observed and predicted implied volatilities on the 203 same-date SPX holdout quotes. The dashed line indicates equality.}
+ \label{fig:holdout}
+\end{figure}
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.88\textwidth]{figures/spx_expiry_paired_metrics.pdf}
+ \caption{Held-out weighted price RMSE by expiry. Each comparison uses the same quotes and valuation date.}
+ \label{fig:expiry}
+\end{figure}
+
+\subsection{PDE consistency and numerical convergence}
+A separate diagnostic checks that the continuous SSVI--Dupire callback and finite-difference PDE price the same fitted SSVI surface consistently. Across grid refinements from $201\times300$ to $401\times1200$, price RMSE versus direct SSVI pricing falls from 0.111 to 0.028 index points (the production grid is $301\times600$, with RMSE 0.049). This supports the numerical implementation at the tested resolution, but it is not independent market validation or proof of convergence of the inverse optimizer.
+\begin{figure}[tbp]
+ \centering\includegraphics[width=.78\textwidth]{figures/spx_pde_consistency.pdf}
+ \caption{PDE repricing consistency with direct SSVI prices under spatial and temporal grid refinement.}
+ \label{fig:pdeconsistency}
+\end{figure}
+
+\clearpage
+\subsection{Leave-one-expiry-out maturity-transfer test}
+The interleaved quote holdout asks whether the model can reprice omitted strikes on expiries that are represented in training. We added a stricter maturity-transfer diagnostic: each of the eight expiries is withheld in turn, and every quote at that expiry is excluded from both the SSVI fit and operator-correction fit. The correction is initialized by the regularized linearized update and refined with up to four nonlinear Gauss--Newton iterations. The selected $\lambda=1000$ is held fixed from the earlier validation; because that selection used the same panel, this is a grouped diagnostic rather than a fully untouched nested evaluation.
+
+For a fair numerical comparison, both the SSVI baseline and corrected model are priced through the same finite-difference Dupire PDE. Across the 1,043 out-of-fold quotes, the results are:
+\begin{center}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrr}\toprule
+Model & Price RMSE & Weighted price RMSE & IV RMSE & Inside bid--ask\\\midrule
+SSVI--Dupire (PDE matched) & \textbf{1.402} & \textbf{6.089} & 0.004341 & \textbf{17.35\%}\\
+SSVI + nonlinear operator correction & 2.850 & 8.137 & \textbf{0.003756} & 9.11\%\\\bottomrule
+\end{tabular}}
+\end{center}
+\begin{figure}[H]
+ \centering\includegraphics[width=.92\textwidth]{figures/spx_expiry_grouped_cv.pdf}
+ \caption{Weighted price RMSE in each leave-one-expiry-out fold. All quotes at the displayed expiry are excluded from model fitting.}
+ \label{fig:groupedcv}
+\end{figure}
+The correction wins on weighted price RMSE in only three of the eight expiry folds. It improves pooled IV RMSE but has worse price RMSE, spread-weighted error, and bid--ask containment. The disagreement across metrics means the interleaved holdout's 88.9\% weighted-RMSE reduction should not be treated as broad model superiority. In particular, the correction does not transfer reliably to expiries omitted from calibration in this one-date panel. The diagnostic is also not independent temporal evidence: all folds share one valuation date, and the regularization choice was previously selected using this same panel. A fully nested maturity test would select $\lambda$ using only the outer training expiries in each fold; chronological multi-date validation is required to assess time and regime robustness.
+
+\section{Discussion and limitations}\label{sec:discussion}
+The experiments demonstrate why local-volatility recovery should be assessed on more than a visually smooth surface. The synthetic experiment provides a controlled setting where truth is known and supports the operator prior under the chosen design. On the available SPX cross-section, a full-domain SSVI prior with a tapered PDE-calibrated correction improves same-date held-out quote reproduction over SSVI alone. The earlier constant-reference formulation underperformed, demonstrating that the correction model and PDE-domain treatment matter. The grouped leave-one-expiry-out result below tempers the quote-holdout improvement: it shows weak maturity transfer on this panel and leaves temporal robustness unresolved.
+
+Several limitations constrain interpretation. First, only one market date is evaluated, so performance across time, volatility regimes, and market events remains unknown. Second, the outer test is a quote-level split from one surface, not independent temporal evidence; neighboring strikes from the same expiry can fall on opposite sides, so the holdout measures same-surface interpolation/repricing. Third, local volatility is sensitive to input-surface quality and boundary extrapolation. Fourth, the synthetic benchmark and its localized features are chosen by the project and may align with the regularizer. Fifth, the report does not certify the recovered market surface as free of static arbitrage. Finally, this study reports pricing calibration, not executable strategy returns, hedging P\&L, transaction-cost-adjusted performance, or statistical evidence of alpha.
+
+\subsection{Next empirical tests}
+A stronger evaluation would use multiple valuation dates and chronological outer holdouts; freeze all tuning choices within each training window; quantify static-arbitrage violations and stability under quote perturbation; compare price fit, IV fit, and surface roughness jointly; and evaluate uncertainty calibration if posterior or Laplace uncertainty is used. Any eventual trading application would require a separately stated real-world hypothesis, historical execution assumptions, bid--ask and fees, risk limits, and a genuine out-of-sample P\&L test.
+
+\section{Conclusion}\label{sec:conclusion}
+This project formulates Dupire local-volatility extraction as a nonlinear, PDE-constrained inverse problem and stabilizes it with a positive operator penalty. The penalty combines correction magnitude, anisotropic smoothness, and spatial potentials for wings and weakly supported regions. Its Hamiltonian resemblance is a useful mathematical design analogy, but the substantive contribution is the regularized calibration pipeline and its evaluation.
+
+On the controlled synthetic benchmark, the operator method recovers the generating surface more accurately than the tested alternatives. On the available one-date SPX holdout, the SSVI-centered operator correction reproduces quotes more closely than SSVI alone, while the earlier constant-reference operator ablation performs worse. The grouped leave-one-expiry-out diagnostic is less favorable: the correction loses to PDE-matched SSVI on pooled weighted price error and wins only three of eight expiry folds. This is evidence against reliable maturity transfer on the tested panel, not a claim of trading alpha or future performance. Broader market usefulness remains to be established across dates and regimes.
+
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}
+\bibitem{Dupire1994} Dupire, B. (1994). Pricing with a Smile. \emph{Risk}, 7(1), 18--20.
+\bibitem{DermanKani1994} Derman, E. and Kani, I. (1994). Riding on a Smile. \emph{Risk}, 7(2), 32--39.
+\bibitem{GatheralJacquier2014} Gatheral, J. and Jacquier, A. (2014). Arbitrage-free SVI volatility surfaces. \emph{Quantitative Finance}, 14(1), 59--71. doi:10.1080/14697688.2013.819986.
+\bibitem{TikhonovArsenin1977} Tikhonov, A. N. and Arsenin, V. Y. (1977). \emph{Solutions of Ill-Posed Problems}. Winston, distributed by Halsted Press.
+\bibitem{CravenWahba1979} Craven, P. and Wahba, G. (1979). Smoothing noisy data with spline functions: estimating the correct degree of smoothing by generalized cross-validation. \emph{Numerische Mathematik}, 31, 377--403. doi:10.1007/BF01404567.
+\bibitem{Griffiths2018} Griffiths, D. J. and Schroeter, D. F. (2018). \emph{Introduction to Quantum Mechanics}, 3rd ed. Cambridge University Press.
+\bibitem{CboeEOD} Cboe Global Markets. \emph{Option EOD Summary}. Available at \url{https://datashop.cboe.com/option-eod-summary}. Snapshot used: 25 August 2023, 15:45 U.S. Eastern.
+\end{thebibliography}
+
+\appendix
+\section{Notation and reproducibility}
+\begin{tabularx}{\textwidth}{>{$}l<{$}X}\toprule
+S_t & Underlying level at time $t$\\
+K,T & Option strike and maturity\\
+F(T) & Forward level for maturity $T$\\
+x=\log(K/F(T)) & Forward log-moneyness\\
+\sigma_{\mathrm{loc}}(x,T) & Risk-neutral local volatility\\
+u=\log\sigma_{\mathrm{loc}}^2 & Log-variance parameterization\\
+F(u) & PDE-generated model prices (not the forward level)\\
+R & Positive discrete regularization operator\\
+V & Spatial penalty potential\\
+\lambda & Data-fit versus regularization tradeoff\\\bottomrule
+\end{tabularx}
+
+\smallskip
+Numerical values and figure data are taken from the saved synthetic and SPX experiment outputs in the accompanying project. The two experiments are reported separately. The market test is a single-date cross-sectional quote holdout. No backtested trading P\&L is claimed.
+\end{document}

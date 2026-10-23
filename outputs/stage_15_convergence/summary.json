@@ -1,0 +1,12 @@
+{
+  "experiment": "continue frozen Stage 13 constant-reference calibration",
+  "selection": "all data choices, lambda, reference and PDE grid held fixed",
+  "maximum_iterations_requested": 12,
+  "stop_reason": "relative_objective_tolerance",
+  "selected_lambda": 1000000.0,
+  "outer_train_quotes": 840,
+  "outer_test_quotes": 203,
+  "surface_local_volatility_min": 0.09619001568127974,
+  "surface_local_volatility_max": 0.4336755637835483,
+  "interpretation": "This is a solver-convergence diagnostic on one date, not an independent test or evidence of trading profitability."
+}

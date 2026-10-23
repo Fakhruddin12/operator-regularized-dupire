@@ -18,6 +18,7 @@ from src.evaluation.ssvi_dupire import (
     ssvi_total_variance,
 )
 from src.pricing.forward_normalized_pde import normalized_black_call_price
+from src.evaluation.ssvi_term_structure import theta_and_derivative
 
 
 def normalized_black_vega(
@@ -392,12 +393,7 @@ def evaluate_market_ssvi_quotes(
     maturities = quote_data["maturity"].to_numpy(dtype=float)
     x = quote_data["log_moneyness"].to_numpy(dtype=float)
 
-    theta_spline = PchipInterpolator(
-        np.concatenate(([0.0], fit.maturities)),
-        np.concatenate(([0.0], fit.theta)),
-        extrapolate=True,
-    )
-    theta_values = theta_spline(maturities)
+    theta_values, _ = theta_and_derivative(fit.maturities, fit.theta, maturities)
     total_variance = ssvi_total_variance(
         x,
         theta_values,
@@ -445,3 +441,65 @@ def evaluate_market_ssvi_local_volatility(
         maturities=maturity_mesh,
         log_moneyness=x_mesh,
     )
+
+
+def make_market_ssvi_local_volatility_function(fit: SSVIFit):
+    """Build a vectorized continuous ``sigma_loc(x,T)`` callback from SSVI.
+
+    Unlike interpolating a coarse local-volatility grid, this evaluates the
+    SSVI total-variance surface and its Dupire derivatives directly. It is
+    useful as a full-domain prior inside a forward PDE; the callback remains
+    valid outside the quoted strike range where a gridded surface would need
+    an explicit extrapolation rule.
+    """
+    from scipy.interpolate import PchipInterpolator
+
+    maturities = np.asarray(fit.maturities, dtype=float)
+    theta_values = np.asarray(fit.theta, dtype=float)
+    if maturities.ndim != 1 or theta_values.shape != maturities.shape:
+        raise ValueError("SSVI maturities and theta must be matching vectors.")
+    if np.any(np.diff(maturities) <= 0) or np.any(theta_values <= 0):
+        raise ValueError("SSVI maturities and theta must be positive and ordered.")
+    if not -1.0 < fit.rho < 1.0 or fit.eta <= 0 or not 0.0 < fit.gamma < 1.0:
+        raise ValueError("SSVI shape parameters are outside their valid ranges.")
+
+    def local_volatility(log_moneyness: np.ndarray, maturity: float) -> np.ndarray:
+        x = np.asarray(log_moneyness, dtype=float)
+        T = float(maturity)
+        if T <= 0 or not np.isfinite(T):
+            raise ValueError("maturity must be positive and finite.")
+        theta, theta_t = theta_and_derivative(maturities, theta_values, T)
+        theta, theta_t = float(theta), float(theta_t)
+        if theta <= 0 or theta_t <= 0:
+            raise ValueError("SSVI ATM total variance must increase with maturity.")
+
+        rho, eta, gamma = fit.rho, fit.eta, fit.gamma
+        phi = eta / (theta**gamma * (1.0 + theta) ** (1.0 - gamma))
+        z = phi * x + rho
+        root = np.sqrt(z**2 + 1.0 - rho**2)
+        w = 0.5 * theta * (1.0 + rho * phi * x + root)
+        w_x = 0.5 * theta * phi * (rho + z / root)
+        w_xx = 0.5 * theta * phi**2 * (1.0 - rho**2) / root**3
+        phi_theta = phi * (-gamma / theta + (gamma - 1.0) / (1.0 + theta))
+        w_theta = (
+            0.5 * (1.0 + rho * phi * x + root)
+            + 0.5 * theta * x * phi_theta * (rho + z / root)
+        )
+        w_t = w_theta * theta_t
+        denominator = (
+            (1.0 - x * w_x / (2.0 * w)) ** 2
+            - 0.25 * (0.25 + 1.0 / w) * w_x**2
+            + 0.5 * w_xx
+        )
+        variance = w_t / denominator
+        if (
+            np.any(~np.isfinite(variance))
+            or np.any(w <= 0)
+            or np.any(w_t <= 0)
+            or np.any(denominator <= 1e-10)
+            or np.any(variance <= 0)
+        ):
+            raise ValueError("SSVI-Dupire local variance is invalid at a requested point.")
+        return np.sqrt(variance)
+
+    return local_volatility
