@@ -1,51 +1,52 @@
-# Operator-Regularized Dupire Calibration
-### Recovering local volatility from sparse option prices
+# Recovering Volatility from Option Prices
 
-## Included saved artifacts
+**Can a model fitted to a limited set of option prices price other options accurately—and recover the right underlying volatility?**
 
-[calibration-arrays.zip](calibration-arrays.zip) contains 644 original saved files. Extract it at the repository root before using the archived arrays or data snapshots:
+An option-pricing model needs to describe how volatility changes across prices and time. Market quotes only reveal part of that picture, and fitting them too closely can produce an unstable surface. This project tests whether a location-dependent penalty makes that reconstruction more reliable.
 
-```bash
-python -m zipfile -e calibration-arrays.zip .
-```
+I built the pricing solver, calibration pipeline and controlled comparisons. The result is **mixed**: the proposed penalty improves some unseen option-price predictions, but can perform worse on entire unseen expiries and is unstable when tested against a known volatility surface. Better pricing on one test does not guarantee better recovery of the hidden surface.
 
-Paths and SHA-256 hashes are recorded in [ARTIFACTS.json](ARTIFACTS.json). Source code, figures and result tables remain directly browsable.
+[**Results and interpretation**](docs/RESULTS.md) · [**Full research report**](Dupire_Literature_Audit_Report.pdf) · [**Theory and assumptions**](reports/Regularizer_Theory.md)
 
-**Research question:** Does adding location-dependent penalties to an inverse option-pricing problem improve generalisation and recovery of the underlying volatility surface?
+## What I built
 
-I built a forward Dupire PDE pricer and a regularized calibration pipeline, then compared the proposed penalty with **SSVI, H1/H2 smoothing and unregularized correction** under shared numerical settings.
+- A numerical solver for the **Dupire option-pricing PDE** and an optimisation routine that fits a positive local-volatility surface to option prices.
+- A penalty combining smoothness with location-dependent terms, motivated by an operator formulation.
+- A common comparison framework for the proposed penalty, a parametric volatility baseline (**SSVI**), simpler smoothness penalties and an unpenalised correction.
+- Tests using both unseen individual quotes and entirely unseen expiry dates, plus synthetic data whose true volatility is known.
 
-**Current conclusion:** The broader audit found **mixed pricing improvements and unstable known-truth recovery**. The project demonstrates numerical research, controlled comparisons and critical evaluation; it does not establish universal superiority or novelty.
+## Results in context
 
-![Known-truth recovery across ten noise draws](docs/assets/recovery-comparison.png)
+These are pricing-error comparisons with the SSVI-based pricing baseline. A smaller RMSE means predicted option prices are closer to the withheld prices.
 
-[**Results and interpretation**](docs/RESULTS.md) · [**Full audit report**](Dupire_Literature_Audit_Report.pdf) · [**Theory**](reports/Regularizer_Theory.md) · [**Literature comparison**](reports/Literature_Comparison.md)
+| Data | What was withheld | Proposed method's pricing error versus baseline |
+|---|---|---:|
+| Euro Stoxx market options | Individual quotes | **34.18% lower** |
+| Euro Stoxx market options | Entire expiries | **46.81% higher** |
+| Author-supplied simulated Bates prices | Individual quotes | **75.30% lower** |
+| Author-supplied simulated Bates prices | Entire expiries | **75.44% lower** |
 
-## The modelling idea
+Across ten new noise draws with known underlying volatility, the proposed method won five times but had **higher mean recovery error** than SSVI: 0.09679 versus 0.04096. Some unstable fits dominate that average. The full study covers **50 outer folds** and reports comparisons with both simpler penalties as well. [All tables and failure modes](docs/RESULTS.md).
 
-Option quotes are sparse and noisy. Differentiating an interpolated price surface can amplify that noise. Instead, the implementation fits a positive local-variance surface by repricing options through the PDE.
+![Known-volatility recovery across ten noise draws](docs/assets/recovery-comparison.png)
 
-The current audit starts with an SSVI reference and fits a tapered log-variance correction. Smoothness, magnitude and location-dependent penalties control that correction. The comparison keeps the reference, correction coordinates, weights, numerical solver and optimisation budget fixed while changing the penalty.
+## How the method works
 
-$$
-\min_h \; \|W(F(u_{\mathrm{ref}}+h)-C_{\mathrm{obs}})\|_2^2+\lambda h^\top R h,
-\qquad \sigma_{\mathrm{loc}}^2=\exp(u).
-$$
+The calibration starts from an SSVI reference surface and fits a tapered correction to its log variance. The penalty discourages excessive size, roughness and certain location-dependent behaviour in that correction. Holding the reference, numerical solver, weights and optimisation budget fixed makes it possible to test whether changing the penalty helps.
 
-Here $F$ is the pricing map and $R$ combines smoothness and potential terms, with the grid scaling defined in the implementation. [The mathematical note](reports/Regularizer_Theory.md) explains the exact linearized risk calculation, the bias–variance trade-off and why stability alone does not guarantee estimation accuracy.
+In technical notation:
 
-## Current evidence
+$$\min_h\;\|W(F(u_{\mathrm{ref}}+h)-C_{\mathrm{obs}})\|_2^2+\lambda h^\top Rh,\qquad\sigma_{\mathrm{loc}}^2=\exp(u).$$
 
-- **50 outer folds** across literature-linked inputs and synthetic recovery experiments.
-- Separate quote and expiry holdouts, plus numerical and parameter-grid sensitivity checks.
-- On ten known-truth noise draws, full-domain mean local-volatility RMSE was **0.09679** for the full operator versus **0.04096** for SSVI; the operator won **5 of 10** draws.
-- Improvements over H1/H2 depend on the dataset and protocol. The [complete results](docs/RESULTS.md) report the losses as well as the wins.
+Here the pricing map is $F$, the fitted correction is $h$, and $R$ defines the penalty. [The derivation](reports/Regularizer_Theory.md) explains the grid scaling and bias–variance trade-off; [the literature comparison](reports/Literature_Comparison.md) distinguishes this implementation from the source papers.
 
-These are finite-budget comparisons. Many selected correction fits reached the iteration limit. H1/H2 are controlled comparators in the same coordinates, rather than exact reproductions of each paper's implementation. Market quote weights are declared numerical weights; bid–ask spreads were unavailable.
+## Limits of the conclusion
 
-## Reproduce
+The comparisons use finite optimisation budgets, and many fits reached iteration limits. Market data provide no true local-volatility surface. Quote weights are declared numerical weights rather than measured bid–ask uncertainty. The simpler penalties share this project's parameterisation and are not exact reproductions of every paper's software. The study evaluates calibration and pricing, not trading profitability or universal superiority.
 
-The archived audit used Python 3.12.14. From the repository root:
+## Reproduce and inspect
+
+Saved result tables and figures are browsable immediately. Python 3.12.14 was used for the audit. From the repository root:
 
 ```bash
 python -m pip install -r requirements-audit.txt
@@ -56,20 +57,8 @@ OPENBLAS_NUM_THREADS=1 python scripts/25_parameter_grid_sensitivity.py
 OPENBLAS_NUM_THREADS=1 python scripts/26_analyze_literature_results.py
 ```
 
-The full benchmark is computationally expensive. Saved tables, diagnostics and the report can be inspected immediately. See [input provenance](data/literature/benchmark_inputs/README.md).
+The full benchmark is computationally expensive. [Input provenance](data/literature/benchmark_inputs/README.md), [pricing code](src/pricing/), [calibration code](src/inverse/) and [penalty code](src/regularization/) provide the implementation detail.
 
-## Where to look
-
-| Location | Purpose |
-|---|---|
-| [src/pricing](src/pricing/) | Forward PDE pricing |
-| [src/inverse](src/inverse/) | Calibration and sensitivities |
-| [src/regularization](src/regularization/) | Operators, grid scaling and potentials |
-| [tests](tests/) | Numerical and implementation checks |
-| [reports/literature_audit](reports/literature_audit/) | Current evidence tables |
-| [outputs/stage_23_literature_audit_final](outputs/stage_23_literature_audit_final/) | Fold-level predictions and diagnostics |
-| [notebooks](notebooks/) | Earlier tutorial and research sequence |
-
-Earlier stage outputs remain available for traceability and were not all regenerated after the audit fixes. Their favourable synthetic numbers are **historical**, not the current headline evidence. The archived Laplace module is outside the current study's scope. This is a calibration study; trading profitability is not evaluated.
+For archived arrays, extract `calibration-arrays.zip` at the repository root with `python -m zipfile -e calibration-arrays.zip .`; [ARTIFACTS.json](ARTIFACTS.json) lists paths and hashes. Earlier notebooks and outputs remain historical evidence, separate from the current audit. The archived Laplace module is outside the current study.
 
 **Author:** Fakhruddin Hakim Hussain · [Portfolio](https://github.com/Fakhruddin12)
