@@ -2,7 +2,7 @@
 
 **Can a model fitted to a limited set of option prices price other options accurately—and recover the right underlying volatility?**
 
-An option-pricing model needs to describe how volatility changes across prices and time. Market quotes only reveal part of that picture, and fitting them too closely can produce an unstable surface. This project tests whether a location-dependent penalty makes that reconstruction more reliable.
+An option-pricing model needs to describe how volatility changes across prices and time. Market quotes only reveal part of that picture, and fitting them too closely can produce an unstable surface. This project tests whether penalising implausible surface shapes makes that reconstruction more reliable.
 
 I built the pricing solver, calibration pipeline and controlled comparisons. The result is **mixed**: the proposed penalty improves some unseen option-price predictions, but can perform worse on entire unseen expiries and is unstable when tested against a known volatility surface. Better pricing on one test does not guarantee better recovery of the hidden surface.
 
