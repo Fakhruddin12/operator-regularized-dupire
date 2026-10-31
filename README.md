@@ -1,6 +1,12 @@
-# Quantum-Mechanics-Inspired Regularisation for Dupire Calibration
+# Operator-Regularised Dupire Calibration
 
-**Can the energy structure of a Schrödinger operator help recover a more reliable local-volatility surface from sparse option prices?**
+[**Project report (PDF)**](reports/PROJECT_REPORT.pdf) · [**Research decision and evidence limits**](docs/RESEARCH_DECISION.md)
+
+Euro Stoxx quote-holdout price RMSE is 34.18% below SSVI but only 0.93% below ordinary H1; whole-expiry RMSE is 46.81% worse than SSVI. On known truth, mean volatility RMSE is 0.09679 versus SSVI 0.04096; five of ten draws favour the full operator.
+
+**Research decision:** Resolve numerical optimisation and recovery instability before claiming benefit from the spatial potentials.
+
+**Does a spatially varying regularisation penalty improve option pricing and local-volatility recovery beyond standard smoothness controls?**
 
 Option prices reveal information about volatility, but a finite set of noisy quotes does not uniquely determine an entire surface. A model can match those quotes while producing unstable behaviour between them. This research project investigates a **quantum-mechanics-inspired regulariser** that controls both how a fitted correction varies and where it is allowed to depart from a reference surface.
 
@@ -134,3 +140,4 @@ OPENBLAS_NUM_THREADS=1 python scripts/26_analyze_literature_results.py
 The full benchmark is computationally expensive. [Input provenance](data/literature/benchmark_inputs/README.md) and [tests](tests/) document the inputs and implementation checks. For archived arrays, extract `calibration-arrays.zip` at the repository root with `python -m zipfile -e calibration-arrays.zip .`; [ARTIFACTS.json](ARTIFACTS.json) lists paths and hashes. Earlier outputs remain historical evidence, separate from the current audit. The archived Laplace module is outside this study.
 
 **Author:** Fakhruddin Hakim Hussain · [Portfolio](https://github.com/Fakhruddin12)
+
